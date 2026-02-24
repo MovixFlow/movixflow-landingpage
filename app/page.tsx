@@ -43,13 +43,6 @@ export default function MovixFlowLanding() {
   const [showModulesModal, setShowModulesModal] = useState(false)
 
 
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      router.push("/dashboard")
-    }
-  }, [isLoggedIn, router])
-
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % totalSlides)

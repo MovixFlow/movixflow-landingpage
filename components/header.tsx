@@ -55,6 +55,10 @@ const TEST_USER = {
   phone: "(11) 98765-4321",
   cnh: "12345678900",
   vehicleType: "Caminhão Baú",
+  vehiclePlate: "ABC-1234",
+  cpf: "000.000.000-00",
+  profileComplete: true,
+  profileCompletionPending: false,
 }
 
 export function Header() {
@@ -78,6 +82,7 @@ export function Header() {
   const [regPhone, setRegPhone] = useState("")
   const [regCnh, setRegCnh] = useState("")
   const [regVehicleType, setRegVehicleType] = useState("")
+  const [regVehiclePlate, setRegVehiclePlate] = useState("")
   const [regPassword, setRegPassword] = useState("")
   const [regConfirmPassword, setRegConfirmPassword] = useState("")
   const [registrationError, setRegistrationError] = useState("")
@@ -123,6 +128,7 @@ export function Header() {
   const [editCnhValidity, setEditCnhValidity] = useState("")
   const [editCnhCategory, setEditCnhCategory] = useState("")
   const [editVehicleType, setEditVehicleType] = useState("")
+  const [editVehiclePlate, setEditVehiclePlate] = useState("")
   const [editResponsibleEmployee, setEditResponsibleEmployee] = useState("")
   const [editCnhFile, setEditCnhFile] = useState<File | null>(null)
   const [editSelfieFile, setEditSelfieFile] = useState<File | null>(null)
@@ -158,6 +164,10 @@ export function Header() {
         phone: TEST_USER.phone,
         cnh: TEST_USER.cnh,
         vehicleType: TEST_USER.vehicleType,
+        vehiclePlate: TEST_USER.vehiclePlate,
+        cpf: TEST_USER.cpf,
+        profileComplete: TEST_USER.profileComplete,
+        profileCompletionPending: TEST_USER.profileCompletionPending,
         // Include other fields if available in the context
       })
       setDriverLoginModalOpen(false)
@@ -177,6 +187,10 @@ export function Header() {
       phone: "(11) 99999-9999",
       cnh: "00000000000",
       vehicleType: "Caminhão",
+      vehiclePlate: "GPX-0000",
+      cpf: "000.000.000-00",
+      profileComplete: true,
+      profileCompletionPending: false,
       // Include other fields if available in the context
     })
     setDriverLoginModalOpen(false)
@@ -220,6 +234,8 @@ export function Header() {
       login({
         ...pendingRegistrationData,
         faceData: imageData, // Store face data within driverData
+        profileComplete: false,
+        profileCompletionPending: true,
       })
 
       setShowFacialRecognition(false)
@@ -249,7 +265,11 @@ export function Header() {
           phone: TEST_USER.phone,
           cnh: TEST_USER.cnh,
           vehicleType: TEST_USER.vehicleType,
+          vehiclePlate: TEST_USER.vehiclePlate,
           faceData: imageData, // This would be the verified face data
+          cpf: TEST_USER.cpf,
+          profileComplete: TEST_USER.profileComplete,
+          profileCompletionPending: TEST_USER.profileCompletionPending,
         })
       }
 
@@ -397,8 +417,8 @@ export function Header() {
 
   const filteredNavigation = isLoggedIn
     ? [
-        { name: "Anúncio de Fretes", href: "/anuncio-de-fretes" },
-      ]
+      { name: "Anúncio de Fretes", href: "/anuncio-de-fretes" },
+    ]
     : navigation
 
   return (
@@ -489,11 +509,10 @@ export function Header() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`px-4 py-3 rounded-lg ${
-                      pathname === item.href
-                        ? "bg-blue-50 text-blue-600 font-semibold"
-                        : "text-gray-600 hover:bg-gray-50 font-medium"
-                    } transition-colors`}
+                    className={`px-4 py-3 rounded-lg ${pathname === item.href
+                      ? "bg-blue-50 text-blue-600 font-semibold"
+                      : "text-gray-600 hover:bg-gray-50 font-medium"
+                      } transition-colors`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.name}
@@ -1093,9 +1112,8 @@ export function Header() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div
-                      className={`p-4 rounded-lg border-2 ${
-                        driverData?.cnhDocument ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
-                      }`}
+                      className={`p-4 rounded-lg border-2 ${driverData?.cnhDocument ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
+                        }`}
                     >
                       <div className="flex items-center gap-2 mb-2">
                         {driverData?.cnhDocument ? (
@@ -1113,9 +1131,8 @@ export function Header() {
                     </div>
 
                     <div
-                      className={`p-4 rounded-lg border-2 ${
-                        driverData?.selfieDocument ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
-                      }`}
+                      className={`p-4 rounded-lg border-2 ${driverData?.selfieDocument ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
+                        }`}
                     >
                       <div className="flex items-center gap-2 mb-2">
                         {driverData?.selfieDocument ? (
@@ -1133,9 +1150,8 @@ export function Header() {
                     </div>
 
                     <div
-                      className={`p-4 rounded-lg border-2 ${
-                        driverData?.cnhExtraDocument ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200"
-                      }`}
+                      className={`p-4 rounded-lg border-2 ${driverData?.cnhExtraDocument ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200"
+                        }`}
                     >
                       <div className="flex items-center gap-2 mb-2">
                         {driverData?.cnhExtraDocument ? (
@@ -1182,17 +1198,15 @@ export function Header() {
                   <button
                     type="button"
                     onClick={() => setEditDriverClassification("frota")}
-                    className={`p-4 rounded-xl border-2 transition-all ${
-                      editDriverClassification === "frota"
-                        ? "border-blue-600 bg-blue-50"
-                        : "border-gray-200 hover:border-blue-300"
-                    }`}
+                    className={`p-4 rounded-xl border-2 transition-all ${editDriverClassification === "frota"
+                      ? "border-blue-600 bg-blue-50"
+                      : "border-gray-200 hover:border-blue-300"
+                      }`}
                   >
                     <div className="flex flex-col items-center gap-2">
                       <div
-                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                          editDriverClassification === "frota" ? "bg-blue-600" : "bg-blue-100"
-                        }`}
+                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${editDriverClassification === "frota" ? "bg-blue-600" : "bg-blue-100"
+                          }`}
                       >
                         <Building
                           className={`w-6 h-6 ${editDriverClassification === "frota" ? "text-white" : "text-blue-600"}`}
@@ -1208,17 +1222,15 @@ export function Header() {
                   <button
                     type="button"
                     onClick={() => setEditDriverClassification("agregado")}
-                    className={`p-4 rounded-xl border-2 transition-all ${
-                      editDriverClassification === "agregado"
-                        ? "border-green-600 bg-green-50"
-                        : "border-gray-200 hover:border-green-300"
-                    }`}
+                    className={`p-4 rounded-xl border-2 transition-all ${editDriverClassification === "agregado"
+                      ? "border-green-600 bg-green-50"
+                      : "border-gray-200 hover:border-green-300"
+                      }`}
                   >
                     <div className="flex flex-col items-center gap-2">
                       <div
-                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                          editDriverClassification === "agregado" ? "bg-green-600" : "bg-green-100"
-                        }`}
+                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${editDriverClassification === "agregado" ? "bg-green-600" : "bg-green-100"
+                          }`}
                       >
                         <Users
                           className={`w-6 h-6 ${editDriverClassification === "agregado" ? "text-white" : "text-green-600"}`}
@@ -1234,17 +1246,15 @@ export function Header() {
                   <button
                     type="button"
                     onClick={() => setEditDriverClassification("autonomo")}
-                    className={`p-4 rounded-xl border-2 transition-all ${
-                      editDriverClassification === "autonomo"
-                        ? "border-orange-600 bg-orange-50"
-                        : "border-gray-200 hover:border-orange-300"
-                    }`}
+                    className={`p-4 rounded-xl border-2 transition-all ${editDriverClassification === "autonomo"
+                      ? "border-orange-600 bg-orange-50"
+                      : "border-gray-200 hover:border-orange-300"
+                      }`}
                   >
                     <div className="flex flex-col items-center gap-2">
                       <div
-                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                          editDriverClassification === "autonomo" ? "bg-orange-600" : "bg-orange-100"
-                        }`}
+                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${editDriverClassification === "autonomo" ? "bg-orange-600" : "bg-orange-100"
+                          }`}
                       >
                         <User
                           className={`w-6 h-6 ${editDriverClassification === "autonomo" ? "text-white" : "text-orange-600"}`}

@@ -11,6 +11,7 @@ interface DriverData {
   cpf: string
   profileComplete: boolean
   profileCompletionPending: boolean
+  vehiclePlate?: string
   // </CHANGE>
   rg?: string
   birthDate?: string
@@ -27,6 +28,7 @@ interface DriverData {
   cnhDocument?: string
   selfieDocument?: string
   cnhExtraDocument?: string
+  faceData?: string
 }
 
 interface UserContextType {
