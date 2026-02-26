@@ -17,8 +17,14 @@ import {
     Search,
     Zap,
     ShieldCheck,
-    ClipboardList
+    ClipboardList,
+    LogOut,
+    UserCircle,
+    ChevronDown
 } from "lucide-react"
+import { useUser } from "@/contexts/user-context"
+import { useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
 
 const menuItems = [
     {
@@ -61,6 +67,24 @@ const menuItems = [
 export function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false)
     const pathname = usePathname()
+    const router = useRouter()
+    const [profileMenuOpen, setProfileMenuOpen] = useState(false)
+    const { isLoggedIn, logout, driverData } = useUser()
+
+    const handleLogout = () => {
+        logout()
+        router.push("/")
+    }
+
+    const getUserInitials = () => {
+        const name = driverData?.name || "U"
+        return name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+            .slice(0, 2)
+    }
 
     return (
         <aside
@@ -145,21 +169,84 @@ export function Sidebar() {
             </div>
 
             {/* Footer / Profile */}
-            <div className="p-4 border-t border-gray-800">
-                <div className={cn(
-                    "bg-gray-900 rounded-2xl p-3 flex items-center transition-all",
-                    isCollapsed ? "justify-center" : "gap-3"
-                )}>
-                    <div className="w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center shrink-0 border border-white/5">
-                        <Users className="w-5 h-5 text-gray-400" />
+            <div className="p-4 border-t border-gray-800 relative">
+                <button
+                    onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                    className={cn(
+                        "w-full bg-gray-900 hover:bg-gray-800 rounded-2xl p-3 flex items-center transition-all group outline-none focus:ring-1 focus:ring-blue-500/50",
+                        isCollapsed ? "justify-center" : "gap-3"
+                    )}
+                >
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shrink-0 border border-white/10 shadow-lg shadow-blue-900/20 group-hover:scale-105 transition-transform">
+                        <span className="text-white text-xs font-black">
+                            {isLoggedIn ? getUserInitials() : <Users className="w-5 h-5 text-blue-100" />}
+                        </span>
                     </div>
                     {!isCollapsed && (
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold text-white truncate">Executivo Master</p>
-                            <p className="text-xs text-gray-500 truncate">Vip Logística S.A.</p>
+                        <div className="flex-1 min-w-0 text-left">
+                            <p className="text-sm font-bold text-white truncate group-hover:text-blue-400 transition-colors">
+                                {isLoggedIn ? (driverData?.name || "Motorista") : "Visitante"}
+                            </p>
+                            <p className="text-[10px] font-black text-gray-500 truncate uppercase tracking-widest">
+                                {isLoggedIn ? "Membro Master" : "Acesse sua conta"}
+                            </p>
                         </div>
                     )}
-                </div>
+                    {!isCollapsed && <ChevronDown className={`w-4 h-4 text-gray-600 group-hover:text-blue-400 transition-all duration-300 ${profileMenuOpen ? "rotate-180" : ""}`} />}
+                </button>
+
+                <AnimatePresence>
+                    {profileMenuOpen && (
+                        <>
+                            <div
+                                className="fixed inset-0 z-40"
+                                onClick={() => setProfileMenuOpen(false)}
+                            />
+                            <motion.div
+                                initial={{ opacity: 0, x: isCollapsed ? 20 : 0, y: -10, scale: 0.95 }}
+                                animate={{ opacity: 1, x: isCollapsed ? 60 : 0, y: -20, scale: 1 }}
+                                exit={{ opacity: 0, x: isCollapsed ? 20 : 0, y: -10, scale: 0.95 }}
+                                className={cn(
+                                    "absolute bottom-full left-4 mb-2 w-64 bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl p-2 z-50 overflow-hidden",
+                                    isCollapsed && "left-20"
+                                )}
+                            >
+                                <div className="px-4 py-3 border-b border-gray-800 mb-1">
+                                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Gestão de Perfil</p>
+                                    <p className="text-xs text-gray-400 font-medium truncate">{driverData?.email || "Sessão Ativa"}</p>
+                                </div>
+
+                                <button
+                                    onClick={() => {
+                                        setProfileMenuOpen(false)
+                                    }}
+                                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-300 hover:bg-gray-800 hover:text-white rounded-xl transition-all"
+                                >
+                                    <UserCircle className="w-4 h-4 text-blue-500" />
+                                    Meu Perfil
+                                </button>
+
+                                <button
+                                    onClick={() => setProfileMenuOpen(false)}
+                                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-300 hover:bg-gray-800 hover:text-white rounded-xl transition-all"
+                                >
+                                    <Settings className="w-4 h-4 text-gray-500" />
+                                    Configurações
+                                </button>
+
+                                <div className="h-px bg-gray-800 my-1 mx-2" />
+
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                    Sair do Sistema
+                                </button>
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Collapse Button */}

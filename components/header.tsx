@@ -1,14 +1,7 @@
 "use client"
 import { AvatarFallback } from "@/components/ui/avatar"
 import { Avatar } from "@/components/ui/avatar"
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
+import { motion, AnimatePresence } from "framer-motion"
 
 import type React from "react"
 
@@ -47,6 +40,7 @@ import {
 } from "lucide-react"
 import { FacialRecognition } from "@/components/facial-recognition"
 import { useUser } from "@/contexts/user-context"
+import { DriverAuthModals } from "@/components/driver-auth-modals"
 
 const TEST_USER = {
   email: "motorista@test.com",
@@ -70,21 +64,10 @@ export function Header() {
   const [loginModalOpen, setLoginModalOpen] = useState(false)
   const [driverLoginModalOpen, setDriverLoginModalOpen] = useState(false)
   const [registrationModalOpen, setRegistrationModalOpen] = useState(false)
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [profileModalOpen, setProfileModalOpen] = useState(false)
-  const [isEditMode, setIsEditMode] = useState(false) // Renamed from isEditingProfile for clarity
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [isEditMode, setIsEditMode] = useState(false)
   const [loginError, setLoginError] = useState("")
-  const [regName, setRegName] = useState("")
-  const [regEmail, setRegEmail] = useState("")
-  const [regPhone, setRegPhone] = useState("")
-  const [regCnh, setRegCnh] = useState("")
-  const [regVehicleType, setRegVehicleType] = useState("")
-  const [regVehiclePlate, setRegVehiclePlate] = useState("")
-  const [regPassword, setRegPassword] = useState("")
-  const [regConfirmPassword, setRegConfirmPassword] = useState("")
   const [registrationError, setRegistrationError] = useState("")
   const [registrationSuccess, setRegistrationSuccess] = useState(false)
 
@@ -155,12 +138,12 @@ export function Header() {
     }
   }
 
-  const handleDriverLogin = (e: React.FormEvent) => {
+  const handleDriverLogin = (e: React.FormEvent, data: any) => {
     e.preventDefault()
-    if (email === TEST_USER.email && password === TEST_USER.password) {
+    if (data.email === TEST_USER.email && data.password === TEST_USER.password) {
       login({
         name: TEST_USER.name,
-        email: email,
+        email: data.email,
         phone: TEST_USER.phone,
         cnh: TEST_USER.cnh,
         vehicleType: TEST_USER.vehicleType,
@@ -168,12 +151,9 @@ export function Header() {
         cpf: TEST_USER.cpf,
         profileComplete: TEST_USER.profileComplete,
         profileCompletionPending: TEST_USER.profileCompletionPending,
-        // Include other fields if available in the context
       })
       setDriverLoginModalOpen(false)
       setLoginError("")
-      setEmail("")
-      setPassword("")
       router.push("/anuncio-de-fretes")
     } else {
       setLoginError("Email ou senha incorretos. Use: motorista@test.com / senha123")
@@ -197,31 +177,25 @@ export function Header() {
     router.push("/anuncio-de-fretes")
   }
 
-  const handleRegistration = (e: React.FormEvent) => {
+  const handleRegistration = (e: React.FormEvent, data: any) => {
     e.preventDefault()
     setRegistrationError("")
 
-    if (!regName || !regEmail || !regCpf || !regPassword || !regConfirmPassword) {
-      setRegistrationError("Por favor, preencha os campos obrigatórios: Nome, Email, CPF e Senha.")
+    if (!data.name || !data.email || !data.cpf || !data.password || !data.confirmPassword) {
+      setRegistrationError("Por favor, preencha os campos obrigatórios.")
       return
     }
 
-    if (regPassword !== regConfirmPassword) {
+    if (data.password !== data.confirmPassword) {
       setRegistrationError("As senhas não coincidem")
       return
     }
 
-    if (regPassword.length < 6) {
-      setRegistrationError("A senha deve ter pelo menos 6 caracteres")
-      return
-    }
-
     setPendingRegistrationData({
-      name: regName,
-      email: regEmail,
-      cpf: regCpf,
-      password: regPassword,
-      // Other fields will be filled in profile completion
+      name: data.name,
+      email: data.email,
+      cpf: data.cpf,
+      password: data.password,
     })
     setRegistrationModalOpen(false)
     setFacialRecognitionMode("register")
@@ -244,11 +218,6 @@ export function Header() {
       // Clear form and show success
       setTimeout(() => {
         setRegistrationSuccess(false)
-        setRegName("")
-        setRegEmail("")
-        setRegCpf("")
-        setRegPassword("")
-        setRegConfirmPassword("")
         setPendingRegistrationData(null)
         // Open login modal
         setDriverLoginModalOpen(true)
@@ -322,7 +291,7 @@ export function Header() {
 
   const loadUserDataForEdit = () => {
     if (driverData) {
-      setEditDriverClassification(driverData.driverClassification || "autonomo")
+      setEditDriverClassification((driverData.driverClassification as any) || "autonomo")
       setEditCompanyName(driverData.companyName || "")
       setEditCompanyCnpj(driverData.companyCnpj || "")
       setEditName(driverData.name || TEST_USER.name)
@@ -339,6 +308,7 @@ export function Header() {
       setEditCnhValidity(driverData.cnhValidity || "")
       setEditCnhCategory(driverData.cnhCategory || "")
       setEditVehicleType(driverData.vehicleType || TEST_USER.vehicleType)
+      setEditVehiclePlate(driverData.vehiclePlate || TEST_USER.vehiclePlate)
       setEditResponsibleEmployee(driverData.responsibleEmployee || "")
     } else {
       // Load test user data as fallback
@@ -347,6 +317,7 @@ export function Header() {
       setEditPhone(TEST_USER.phone)
       setEditCnh(TEST_USER.cnh)
       setEditVehicleType(TEST_USER.vehicleType)
+      setEditVehiclePlate(TEST_USER.vehiclePlate)
     }
   }
 
@@ -384,10 +355,11 @@ export function Header() {
       cnhValidity: editCnhValidity,
       cnhCategory: editCnhCategory,
       vehicleType: editVehicleType,
+      vehiclePlate: editVehiclePlate,
       responsibleEmployee: editResponsibleEmployee,
-      cnhDocument: editCnhFile, // Renamed from documents.cnh for clarity
-      selfieDocument: editSelfieFile, // Renamed from documents.selfie
-      cnhExtraDocument: editCnhExtraFile, // Renamed from documents.cnhExtra
+      cnhDocument: editCnhFile ? "local-file-stub" : undefined,
+      selfieDocument: editSelfieFile ? "local-file-stub" : undefined,
+      cnhExtraDocument: editCnhExtraFile ? "local-file-stub" : undefined,
     }
 
     updateDriverData(updatedData)
@@ -442,47 +414,80 @@ export function Header() {
               ))}
             </div>
 
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-4 relative">
               {isLoggedIn ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="flex items-center gap-3 hover:bg-gray-50 px-4 py-2 rounded-lg transition-all"
-                    >
-                      <Avatar className="w-9 h-9 ring-2 ring-gray-100">
-                        <AvatarFallback className="bg-gradient-to-br from-blue-600 to-blue-700 text-white text-sm font-semibold">
-                          {getUserInitials()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-gray-700 font-medium">{driverData?.name || "Motorista"}</span>
-                      <ChevronDown className="w-4 h-4 text-gray-400" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 mt-2">
-                    <DropdownMenuLabel className="font-semibold">Minha Conta</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setProfileModalOpen(true)} className="cursor-pointer py-2.5">
-                      <UserCircle className="w-4 h-4 mr-3" />
-                      Meu Perfil
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => router.push("/anuncio-de-fretes")}
-                      className="cursor-pointer py-2.5"
-                    >
-                      <Truck className="w-4 h-4 mr-3" />
-                      Fretes Disponíveis
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={handleLogout}
-                      className="text-red-600 focus:text-red-600 cursor-pointer py-2.5"
-                    >
-                      <LogOut className="w-4 h-4 mr-3" />
-                      Sair
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="relative">
+                  <Button
+                    variant="ghost"
+                    className="flex items-center gap-3 hover:bg-gray-50 px-4 py-2 rounded-xl transition-all"
+                    onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                  >
+                    <Avatar className="w-9 h-9 ring-2 ring-gray-100 shadow-sm">
+                      <AvatarFallback className="bg-gradient-to-br from-blue-600 to-blue-700 text-white text-sm font-black tracking-tighter">
+                        {getUserInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-gray-900 font-bold text-sm tracking-tight">{driverData?.name || "Motorista"}</span>
+                    <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${profileMenuOpen ? "rotate-180" : ""}`} />
+                  </Button>
+
+                  <AnimatePresence>
+                    {profileMenuOpen && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-40"
+                          onClick={() => setProfileMenuOpen(false)}
+                        />
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          className="absolute right-0 mt-3 w-64 bg-white border border-gray-100 rounded-[1.5rem] shadow-2xl p-2 z-50 overflow-hidden"
+                        >
+                          <div className="px-4 py-3 border-b border-gray-50 mb-1">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Gestão de Conta</p>
+                            <p className="text-xs text-gray-500 font-medium truncate">{driverData?.email}</p>
+                          </div>
+
+                          <button
+                            onClick={() => {
+                              setProfileModalOpen(true)
+                              setProfileMenuOpen(false)
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-xl transition-all"
+                          >
+                            <UserCircle className="w-4 h-4 text-blue-500" />
+                            Meu Perfil
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              router.push("/anuncio-de-fretes")
+                              setProfileMenuOpen(false)
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-xl transition-all"
+                          >
+                            <Truck className="w-4 h-4 text-gray-400" />
+                            Fretes Disponíveis
+                          </button>
+
+                          <div className="h-px bg-gray-50 my-1 mx-2" />
+
+                          <button
+                            onClick={() => {
+                              handleLogout()
+                              setProfileMenuOpen(false)
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            Sair do Sistema
+                          </button>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
               ) : (
                 <Button
                   className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all"
@@ -523,7 +528,7 @@ export function Header() {
                     <>
                       <Button
                         variant="ghost"
-                        className="text-gray-600 hover:bg-gray-50 w-full justify-start px-4 py-3 h-auto font-medium"
+                        className="text-gray-600 hover:bg-blue-50 hover:text-blue-700 w-full justify-start px-4 py-3 h-auto font-medium transition-all"
                         onClick={() => {
                           setProfileModalOpen(true)
                           setMobileMenuOpen(false)
@@ -610,287 +615,14 @@ export function Header() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={driverLoginModalOpen} onOpenChange={setDriverLoginModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <div className="flex flex-col items-center gap-3 mb-2">
-              <img src="/logo.svg" alt="MovixFlow" className="h-8 w-auto" />
-              <DialogTitle className="text-xl font-bold text-center text-gray-900">Login - Motorista</DialogTitle>
-            </div>
-          </DialogHeader>
-
-          <div className="space-y-6 py-4">
-            {/* CHANGE: Removed test user credentials box */}
-
-            {loginError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600 text-center">{loginError}</p>
-              </div>
-            )}
-
-            {/* CHANGE: Removed facial recognition button */}
-
-            <Button
-              type="button"
-              onClick={handleGoogleSignIn}
-              variant="outline"
-              className="w-full h-12 border-2 border-gray-300 hover:bg-gray-50 font-semibold text-gray-700 flex items-center justify-center gap-3 bg-transparent"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66 2.84.81-.62z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-              </svg>
-              Continuar com Google
-            </Button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500 font-medium">ou</span>
-              </div>
-            </div>
-
-            <form onSubmit={handleDriverLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="driver-email" className="text-gray-900 font-medium">
-                  Email
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="driver-email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="driver-password" className="text-gray-900 font-medium">
-                  Senha
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="driver-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Digite sua senha"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <button type="button" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                  Esqueceu sua senha?
-                </button>
-              </div>
-
-              <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold">
-                Entrar
-              </Button>
-
-              <div className="text-center text-sm text-gray-600">
-                Não tem uma conta?{" "}
-                <button
-                  type="button"
-                  onClick={handleCreateAccountClick}
-                  className="text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  Criar conta
-                </button>
-              </div>
-            </form>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={registrationModalOpen} onOpenChange={setRegistrationModalOpen}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
-          <DialogHeader>
-            <div className="flex justify-center mb-2">
-              <img src="/logo.svg" alt="MovixFlow" className="h-8 w-auto" />
-            </div>
-            <DialogTitle className="text-2xl font-bold text-center text-gray-900">Cadastro de Motorista</DialogTitle>
-            <DialogDescription className="text-center text-gray-600">
-              Crie sua conta rapidamente. Você poderá completar seu perfil depois.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={handleRegistration} className="space-y-6 py-4">
-            {registrationError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600 text-center">{registrationError}</p>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="reg-name" className="text-gray-900 font-medium">
-                  Nome Completo *
-                </Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="reg-name"
-                    type="text"
-                    placeholder="Seu nome completo"
-                    value={regName}
-                    onChange={(e) => setRegName(e.target.value)}
-                    className="pl-10 h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="reg-email" className="text-gray-900 font-medium">
-                  Email *
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="reg-email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    value={regEmail}
-                    onChange={(e) => setRegEmail(e.target.value)}
-                    className="pl-10 h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="reg-cpf" className="text-gray-900 font-medium">
-                  CPF *
-                </Label>
-                <div className="relative">
-                  <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="reg-cpf"
-                    type="text"
-                    placeholder="000.000.000-00"
-                    value={regCpf}
-                    onChange={(e) => setRegCpf(e.target.value)}
-                    className="pl-10 h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="reg-password" className="text-gray-900 font-medium">
-                  Senha *
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="reg-password"
-                    type={showRegPassword ? "text" : "password"}
-                    placeholder="Crie uma senha segura"
-                    value={regPassword}
-                    onChange={(e) => setRegPassword(e.target.value)}
-                    className="pl-10 pr-10 h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowRegPassword(!showRegPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showRegPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="reg-confirm-password" className="text-gray-900 font-medium">
-                  Confirmar Senha *
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="reg-confirm-password"
-                    type={showRegConfirmPassword ? "text" : "password"}
-                    placeholder="Confirme sua senha"
-                    value={regConfirmPassword}
-                    onChange={(e) => setRegConfirmPassword(e.target.value)}
-                    className="pl-10 pr-10 h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowRegConfirmPassword(!showRegConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showRegConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-700 text-center">
-                  Após criar sua conta, você poderá completar seu perfil com informações adicionais como CNH, veículo e
-                  documentos.
-                </p>
-              </div>
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-              disabled={registrationSuccess}
-            >
-              Cadastrar
-            </Button>
-
-            <div className="text-center text-sm text-gray-600">
-              Já tem uma conta?{" "}
-              <button
-                type="button"
-                onClick={() => {
-                  setRegistrationModalOpen(false)
-                  setDriverLoginModalOpen(true)
-                }}
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Fazer login
-              </button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <DriverAuthModals
+        loginOpen={driverLoginModalOpen}
+        setLoginOpen={setDriverLoginModalOpen}
+        regOpen={registrationModalOpen}
+        setRegOpen={setRegistrationModalOpen}
+        customHandleLogin={handleDriverLogin}
+        customHandleRegister={handleRegistration}
+      />
 
       <Dialog open={showFacialRecognition} onOpenChange={setShowFacialRecognition}>
         <DialogContent className="sm:max-w-lg">
@@ -898,7 +630,7 @@ export function Header() {
             onCapture={handleFacialCapture}
             onCancel={handleFacialCancel}
             mode={facialRecognitionMode}
-            storedFaceData={faceData} // Use faceData from context
+            storedFaceData={faceData || undefined} // Use faceData from context
           />
         </DialogContent>
       </Dialog>
@@ -1101,6 +833,10 @@ export function Header() {
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <Label className="text-xs text-gray-600 uppercase font-semibold">Tipo de Veículo</Label>
                     <p className="text-gray-900 font-medium mt-1">{driverData?.vehicleType || TEST_USER.vehicleType}</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <Label className="text-xs text-gray-600 uppercase font-semibold">Placa do Veículo</Label>
+                    <p className="text-gray-900 font-medium mt-1">{driverData?.vehiclePlate || TEST_USER.vehiclePlate}</p>
                   </div>
                 </div>
 
@@ -1551,6 +1287,21 @@ export function Header() {
                       placeholder="Caminhão Baú"
                       value={editVehicleType}
                       onChange={(e) => setEditVehicleType(e.target.value)}
+                      className="h-11 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-plate" className="text-gray-900 font-medium">
+                      Placa do Veículo *
+                    </Label>
+                    <Input
+                      id="edit-plate"
+                      type="text"
+                      placeholder="ABC-1234"
+                      value={editVehiclePlate}
+                      onChange={(e) => setEditVehiclePlate(e.target.value.toUpperCase())}
                       className="h-11 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
                       required
                     />

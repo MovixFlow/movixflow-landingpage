@@ -1,4 +1,7 @@
 "use client"
+
+import React, { useEffect, useState, useRef } from "react"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -26,19 +29,58 @@ import {
   TrendingDown,
   Package,
   MessageCircle,
+  Award,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import { Header } from "@/components/header"
-import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useUser } from "@/contexts/user-context"
-import { motion, useInView, useScroll, useTransform } from "framer-motion"
+import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { ModalAllModules } from "@/components/modal-all-modules"
+import { Footer } from "@/components/footer"
 
 export default function MovixFlowLanding() {
   const router = useRouter()
   const { isLoggedIn } = useUser()
   const [currentSlide, setCurrentSlide] = useState(0)
-  const totalSlides = 3
+  const heroSlides = [
+    {
+      badge: "Logística Inteligente",
+      icon: Truck,
+      title: (
+        <>
+          Eficiência e <span className="text-blue-600">Alta Performance</span>
+          <br />
+          <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent text-[0.8em]">
+            o controle total da sua frota em tempo real
+          </span>
+        </>
+      ),
+      description: "Transforme sua gestão operacional com monitoramento de ponta a ponta. Reduza custos, otimize rotas e alcance novos níveis de ROI.",
+      primaryBtn: "Solicitar Demonstração Executiva",
+      secondaryBtn: "Ver Soluções Logísticas",
+      bgGradient: "from-blue-50/50 to-white"
+    },
+    {
+      badge: "Gerenciamento de Riscos",
+      icon: Shield,
+      title: (
+        <>
+          Prevenção Ativa e <span className="text-blue-600">Segurança</span>
+          <br />
+          <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent text-[0.8em]">
+            a inteligência que antecipa incidentes críticos
+          </span>
+        </>
+      ),
+      description: "Prevenção ativa com biometria facial e alertas preditivos 24/7. Mitigue riscos antes que se tornem prejuízos para sua operação.",
+      primaryBtn: "Falar com Especialista de Risco",
+      secondaryBtn: "Explorar Tecnologia de Risco",
+      bgGradient: "from-indigo-50/50 to-white"
+    }
+  ]
+  const totalSlides = heroSlides.length
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
   const [showModulesModal, setShowModulesModal] = useState(false)
 
@@ -202,70 +244,94 @@ export default function MovixFlowLanding() {
           <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-50 rounded-full blur-[120px] opacity-60" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full mb-8 border border-blue-100 backdrop-blur-sm">
-              <Shield className="w-4 h-4" />
-              <span className="text-sm font-semibold tracking-wide uppercase">SaaS Logístico Inteligente</span>
-            </div>
-
-            <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black text-gray-900 mb-8 tracking-tight leading-[0.9]">
-              Prevenção ativa e <span className="text-blue-600">eficiência</span>
-              <br />
-              <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent text-[0.8em]">
-                a inteligência que antecipa incidentes
-              </span>
-            </h1>
-
-            <p className="max-w-3xl mx-auto text-xl sm:text-2xl text-gray-600 mb-12 leading-relaxed font-medium">
-              Transforme sua gestão logística com a única plataforma que integra monitoramento inteligente e análise preditiva de riscos. Reduza prejuízos e assuma o controlestrategico da sua frota.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-5 justify-center">
-              <Button
-                size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white text-xl px-12 py-8 h-auto rounded-2xl shadow-2xl shadow-blue-200/50 transition-all hover:scale-105 active:scale-95 group"
-                onClick={handleTalkToSpecialist}
-              >
-                Solicitar Demonstração Executiva
-                <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-gray-200 text-gray-700 hover:bg-gray-50 text-xl px-12 py-8 h-auto rounded-2xl transition-all font-bold"
-                asChild
-              >
-                <a href="#beneficios">Ver Soluções de Risco</a>
-              </Button>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="mt-20 relative mx-auto max-w-5xl"
-          >
-            <div className="aspect-[16/9] bg-gradient-to-br from-gray-900 to-blue-900 rounded-[2.5rem] shadow-3xl overflow-hidden border-[8px] border-white ring-1 ring-gray-200">
-              {/* Dashboard Preview / BI Mockup Area */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-white/20 font-black text-4xl uppercase tracking-widest">Dashboard Executivo Preview</div>
-                <div className="absolute top-10 left-10 w-32 h-32 bg-blue-500/20 rounded-2xl backdrop-blur-xl border border-white/10" />
-                <div className="absolute bottom-10 right-10 w-48 h-32 bg-white/10 rounded-2xl backdrop-blur-xl border border-white/10" />
-                <div className="absolute top-1/2 right-20 w-12 h-64 bg-green-500/20 rounded-full blur-3xl" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="relative z-10"
+            >
+              <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full mb-8 border border-blue-100 backdrop-blur-sm">
+                {React.createElement(heroSlides[currentSlide].icon, { className: "w-4 h-4" })}
+                <span className="text-sm font-semibold tracking-wide uppercase">{heroSlides[currentSlide].badge}</span>
               </div>
+
+              <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black text-gray-900 mb-8 tracking-tight leading-[0.9]">
+                {heroSlides[currentSlide].title}
+              </h1>
+
+              <p className="max-w-3xl mx-auto text-xl sm:text-2xl text-gray-600 mb-12 leading-relaxed font-medium">
+                {heroSlides[currentSlide].description}
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-5 justify-center">
+                <Button
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-xl px-12 py-8 h-auto rounded-2xl shadow-2xl shadow-blue-200/50 transition-all hover:scale-[1.02] active:scale-95 group font-bold"
+                  onClick={handleTalkToSpecialist}
+                >
+                  {heroSlides[currentSlide].primaryBtn}
+                  <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <Button
+                  size="lg"
+                  className="border-2 border-blue-100 bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 text-xl px-12 py-8 h-auto rounded-2xl transition-all font-bold shadow-sm"
+                  asChild
+                >
+                  <a href="#beneficios">{heroSlides[currentSlide].secondaryBtn}</a>
+                </Button>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Navigation Controls */}
+          <div className="mt-12 flex items-center justify-center gap-6">
+            <button
+              onClick={() => setCurrentSlide(prev => (prev - 1 + totalSlides) % totalSlides)}
+              className="w-12 h-12 rounded-full border border-gray-100 flex items-center justify-center hover:bg-white hover:shadow-lg transition-all text-gray-400 hover:text-blue-600 shadow-sm"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <div className="flex gap-3">
+              {heroSlides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentSlide(i)}
+                  className={cn(
+                    "h-2 rounded-full transition-all duration-500",
+                    currentSlide === i ? "w-12 bg-blue-600" : "w-3 bg-gray-200 hover:bg-gray-300"
+                  )}
+                />
+              ))}
             </div>
-            {/* Trust Badges */}
-            <div className="mt-12 flex flex-wrap justify-center items-center gap-12 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
-              <span className="text-2xl font-bold">TJ GERENCIAMENTO DE RISCOS</span>
-            </div>
-          </motion.div>
+            <button
+              onClick={() => setCurrentSlide(prev => (prev + 1) % totalSlides)}
+              className="w-12 h-12 rounded-full border border-gray-100 flex items-center justify-center hover:bg-white hover:shadow-lg transition-all text-gray-400 hover:text-blue-600 shadow-sm"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className="mt-20 relative mx-auto max-w-5xl"
+        >
+          <div className="aspect-[16/9] bg-gradient-to-br from-gray-900 to-blue-900 rounded-[2.5rem] shadow-3xl overflow-hidden border-[8px] border-white ring-1 ring-gray-200">
+            {/* Dashboard Preview / BI Mockup Area */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-white/20 font-black text-4xl uppercase tracking-widest">Dashboard Executivo Preview</div>
+              <div className="absolute top-10 left-10 w-32 h-32 bg-blue-500/20 rounded-2xl backdrop-blur-xl border border-white/10" />
+              <div className="absolute bottom-10 right-10 w-48 h-32 bg-white/10 rounded-2xl backdrop-blur-xl border border-white/10" />
+              <div className="absolute top-1/2 right-20 w-12 h-64 bg-green-500/20 rounded-full blur-3xl" />
+            </div>
+          </div>
+        </motion.div>
       </section>
 
       {/* Como Funciona - Clean 3 Steps */}
@@ -417,68 +483,119 @@ export default function MovixFlowLanding() {
         </div>
       </section>
 
-      {/* Pricing - Pro Focus */}
-      <section id="pricing" className="py-32 bg-white">
+      {/* Pricing - Strategic Value Focus */}
+      <section id="pricing" className="py-32 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">Investimento que se paga</h2>
-            <p className="text-xl text-gray-600">Planos escaláveis para frotas de todos os tamanhos.</p>
+          <div className="text-center mb-24">
+            <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-6 tracking-tight">
+              Escalabilidade com Governança Logística
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Abandone a gestão intuitiva. Proteja sua margem com inteligência de dados e controle de ativos em tempo real.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* Professional (Focus) */}
-            <div className="md:col-span-1 order-2 md:order-1">
-              <div className="border border-gray-200 p-10 rounded-[2.5rem] h-full flex flex-col hover:border-blue-200 transition-colors">
-                <h3 className="text-2xl font-bold mb-4">Essencial</h3>
-                <div className="mb-8">
-                  <span className="text-5xl font-black text-gray-900">R$ 335</span>
-                  <span className="text-gray-500 text-xl">/mês</span>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto items-stretch">
+            {/* Essential Plan */}
+            <div className="flex flex-col bg-white p-8 rounded-[2rem] border border-gray-200 hover:shadow-xl transition-all h-full">
+              <div className="mb-8">
+                <h3 className="text-xl font-bold text-gray-400 uppercase tracking-widest mb-4">Controle Operacional</h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-5xl font-black text-gray-900">R$ 67</span>
+                  <span className="text-gray-500 font-bold">/mês</span>
                 </div>
-                <ul className="space-y-4 mb-10 flex-1">
-                  {["Até 5 usuários", "Monitoramento Real-time", "Gestão de Motoristas", "Suporte via E-mail"].map((f, i) => (
-                    <li key={i} className="flex gap-3 text-gray-600">
-                      <CheckCircle2 className="w-5 h-5 text-blue-600" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <Button variant="outline" className="w-full py-6 rounded-2xl border-2 font-bold">Assinar Plano</Button>
+                <p className="text-sm text-blue-600 font-bold mt-2 italic">1 usuário</p>
               </div>
+
+              <ul className="space-y-4 mb-10 flex-1">
+                {[
+                  "Checklist Digital & Documentos",
+                  "Monitoramento Real-time Básico",
+                  "Gestão de até 50 Motoristas",
+                  "Suporte Regional via Chat",
+                  "Marketplace de Fretes Integrado"
+                ].map((f, i) => (
+                  <li key={i} className="flex gap-3 text-gray-600 font-medium items-center">
+                    <CheckCircle2 className="w-5 h-5 text-blue-600" /> {f}
+                  </li>
+                ))}
+              </ul>
+
+              <Button className="w-full py-7 rounded-2xl border-2 border-blue-100 bg-white text-blue-700 font-bold text-lg hover:bg-blue-50 hover:text-blue-800 hover:border-blue-200 transition-all">
+                Iniciar Digitalização
+              </Button>
             </div>
 
-            <div className="md:col-span-1 order-1 md:order-2 scale-110 relative z-10">
-              <div className="bg-blue-600 p-10 rounded-[2.5rem] h-full flex flex-col shadow-2xl shadow-blue-300 text-white">
-                <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-amber-400 text-blue-900 font-bold px-6 py-2 rounded-full text-sm">MAIS ESCOLHIDO</div>
-                <h3 className="text-2xl font-bold mb-4">Profissional</h3>
-                <div className="mb-8">
-                  <span className="text-5xl font-black">R$ 590</span>
-                  <span className="text-blue-100 text-xl">/mês</span>
-                </div>
-                <ul className="space-y-4 mb-10 flex-1">
-                  {["Até 10 usuários", "BI Operacional Completo", "Alertas via WhatsApp", "Prioridade de Suporte", "API de Integração"].map((f, i) => (
-                    <li key={i} className="flex gap-3 text-blue-50">
-                      <CheckCircle2 className="w-5 h-5 text-white" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <Button className="w-full py-8 rounded-2xl bg-white text-blue-600 hover:bg-gray-100 font-black text-lg">EXPERIMENTAR GRÁTIS</Button>
+            {/* Professional Plan - Strategic (Highlighted) */}
+            <div className="flex flex-col bg-blue-600 p-8 rounded-[2rem] shadow-2xl shadow-blue-200 relative transform lg:scale-105 z-10 text-white h-full border-4 border-blue-400">
+              <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-amber-400 text-blue-900 font-black px-8 py-2 rounded-full text-sm shadow-lg flex items-center gap-2">
+                <Award className="w-4 h-4" /> ESTRATÉGICO PARA EXPANSÃO
               </div>
+
+              <div className="mb-8 mt-4">
+                <h3 className="text-xl font-bold text-blue-100 uppercase tracking-widest mb-4">Eficiência & Risco</h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-5xl font-black">R$ 670</span>
+                  <span className="text-blue-200 font-bold">/mês</span>
+                </div>
+                <p className="text-sm text-amber-300 font-bold mt-2">10 usuários</p>
+              </div>
+
+              <div className="bg-blue-700/50 p-4 rounded-xl mb-8 border border-white/10">
+                <p className="text-sm font-bold flex items-center gap-2">
+                  <TrendingDown className="w-4 h-4 text-amber-400" />
+                  Redução projetada de 22% em incidentes operacionais
+                </p>
+              </div>
+
+              <ul className="space-y-4 mb-10 flex-1">
+                {[
+                  "BI de Sinistralidade Avançado",
+                  "Alertas Ativos via WhatsApp",
+                  "Gestão de Manutenção Preventiva",
+                  "Prioridade no Marketplace",
+                  "KPIs de Performance Exclusivos",
+                  "Suporte Priority 24/7"
+                ].map((f, i) => (
+                  <li key={i} className="flex gap-3 text-blue-50 font-medium items-center">
+                    <CheckCircle2 className="w-5 h-5 text-amber-400" /> {f}
+                  </li>
+                ))}
+              </ul>
+
+              <Button className="w-full py-9 rounded-2xl bg-white text-blue-700 hover:bg-amber-400 hover:text-blue-950 font-black text-xl shadow-xl transition-all border-0">
+                Falar com Especialista em Risco
+              </Button>
             </div>
 
-            <div className="md:col-span-1 order-3">
-              <div className="border border-gray-200 p-10 rounded-[2.5rem] h-full flex flex-col hover:border-blue-200 transition-colors">
-                <h3 className="text-2xl font-bold mb-4">Enterprise</h3>
-                <div className="mb-8">
-                  <span className="text-3xl font-black text-gray-900 italic">Sob consulta</span>
+            {/* Enterprise Plan */}
+            <div className="flex flex-col bg-white p-8 rounded-[2rem] border border-gray-200 hover:shadow-xl transition-all h-full">
+              <div className="mb-8">
+                <h3 className="text-xl font-bold text-gray-400 uppercase tracking-widest mb-4">Governança & Global</h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-black text-gray-900 italic">Sob consulta</span>
                 </div>
-                <ul className="space-y-4 mb-10 flex-1">
-                  {["Usuários Ilimitados", "Consultoria de Implantação", "SLA Garantido", "Módulos Customizados"].map((f, i) => (
-                    <li key={i} className="flex gap-3 text-gray-600">
-                      <CheckCircle2 className="w-5 h-5 text-blue-600" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <Button variant="outline" className="w-full py-6 rounded-2xl border-2 font-bold">Falar com Consultor</Button>
+                <p className="text-sm text-indigo-600 font-bold mt-2">Volume Ilimitado / Embarcadores</p>
               </div>
+
+              <ul className="space-y-4 mb-10 flex-1">
+                {[
+                  "BI Executivo (CEO View Dashboard)",
+                  "API de Integração Total (TMS/ERP)",
+                  "Gerente de Sucesso Dedicado",
+                  "Módulos Customizados sob Demanda",
+                  "Consultoria de Implantação In-loco",
+                  "SLA de Resposta Crítica"
+                ].map((f, i) => (
+                  <li key={i} className="flex gap-3 text-gray-600 font-medium items-center">
+                    <CheckCircle2 className="w-5 h-5 text-indigo-600" /> {f}
+                  </li>
+                ))}
+              </ul>
+
+              <Button className="w-full py-7 rounded-2xl border-2 border-indigo-100 bg-white text-indigo-700 font-bold text-lg hover:bg-indigo-50 hover:text-indigo-800 hover:border-indigo-200 transition-all">
+                Agendar Demo Corporativa
+              </Button>
             </div>
           </div>
         </div>
@@ -492,44 +609,13 @@ export default function MovixFlowLanding() {
           <p className="text-xl text-blue-100 mb-12 max-w-2xl mx-auto font-medium">Assuma o controle total da sua transportadora hoje mesmo. Reduza riscos imprevistos e maximize sua margem de lucro com o MovixFlow.</p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 px-12 py-8 h-auto rounded-2xl text-xl font-bold shadow-xl">Agendar Reunião Estratégica</Button>
-            <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 px-12 py-8 h-auto rounded-2xl text-xl font-bold bg-transparent">Falar com Especialista</Button>
+            <Button size="lg" className="border-2 border-white/30 text-white hover:bg-white hover:text-blue-700 px-12 py-8 h-auto rounded-2xl text-xl font-bold bg-transparent transition-all">Falar com Especialista</Button>
           </div>
         </div>
       </section>
 
       {/* Footer Simplified */}
-      <footer className="py-20 bg-gray-50 border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-12">
-            <div className="max-w-xs text-center md:text-left">
-              <img src="/logo.svg" alt="MovixFlow" className="h-8 mb-6 mx-auto md:mx-0" />
-              <p className="text-gray-500 font-medium">Tecnologia inteligente para gestão de risco e performance logística nacional.</p>
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-12 text-gray-600 font-semibold">
-              <a href="#" className="hover:text-blue-600 transition-colors">Produto</a>
-              <a href="#" className="hover:text-blue-600 transition-colors">Soluções</a>
-              <a href="#" className="hover:text-blue-600 transition-colors">Preços</a>
-              <a href="#" className="hover:text-blue-600 transition-colors">Blog</a>
-            </div>
-
-            <div className="flex gap-4">
-              {/* Social icons could go here */}
-              <div className="w-10 h-10 bg-gray-200 rounded-full" />
-              <div className="w-10 h-10 bg-gray-200 rounded-full" />
-              <div className="w-10 h-10 bg-gray-200 rounded-full" />
-            </div>
-          </div>
-
-          <div className="mt-20 pt-10 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-6 text-gray-400 text-sm font-medium">
-            <p>© 2025 MovixFlow Logística Humana S.A.</p>
-            <div className="flex gap-8">
-              <a href="#">Privacidade</a>
-              <a href="#">Termos</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       <ModalAllModules
         isOpen={showModulesModal}

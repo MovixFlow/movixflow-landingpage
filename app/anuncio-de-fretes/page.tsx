@@ -40,6 +40,8 @@ import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
 import { useUser } from "@/contexts/user-context"
 import { toast } from "sonner"
+import { DriverAuthModals } from "@/components/driver-auth-modals"
+import { Footer } from "@/components/footer"
 
 type Freight = {
   origin: string
@@ -62,7 +64,7 @@ const TEST_USER = {
   email: "motorista@test.com",
   password: "senha123",
   name: "João Silva",
-  phone: "(11) 98765-4321",
+  phone: "(63) 99274-8276",
   cnh: "12345678900",
   vehicleType: "Caminhão Baú",
   cpf: "123.456.789-00",
@@ -85,16 +87,6 @@ export default function AnuncioDeFretes() {
   const [weightRange, setWeightRange] = useState({ min: "", max: "" })
   const [selectedRegion, setSelectedRegion] = useState("Todas")
 
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [loginError, setLoginError] = useState("")
-  const [regName, setRegName] = useState("")
-  const [regCpf, setRegCpf] = useState("")
-  const [regPassword, setRegPassword] = useState("")
-  const [regConfirmPassword, setRegConfirmPassword] = useState("")
-  // </CHANGE>
   const [registrationError, setRegistrationError] = useState("")
   const [registrationSuccess, setRegistrationSuccess] = useState(false)
 
@@ -118,7 +110,7 @@ export default function AnuncioDeFretes() {
       description: "Transporte de materiais de construção para obra residencial",
       requirements: ["Caminhão truck", "Lona para cobertura", "Motorista com experiência"],
       contact: {
-        phone: "(11) 98765-4321",
+        phone: "(63) 99274-8276",
         email: "contato@transportadorasp.com.br",
       },
     },
@@ -134,7 +126,7 @@ export default function AnuncioDeFretes() {
       description: "Transporte de equipamentos eletrônicos e vidros temperados",
       requirements: ["Caminhão baú", "Sistema de amarração especial", "Seguro obrigatório"],
       contact: {
-        phone: "(41) 99876-5432",
+        phone: "(63) 99274-8276",
         email: "operacoes@sulexpress.com.br",
       },
     },
@@ -150,7 +142,7 @@ export default function AnuncioDeFretes() {
       description: "Transporte de alimentos perecíveis para rede de supermercados",
       requirements: ["Caminhão refrigerado", "Temperatura controlada 2-8°C", "Entrega expressa"],
       contact: {
-        phone: "(31) 97654-3210",
+        phone: "(63) 99274-8276",
         email: "fresh@freshlog.com.br",
       },
     },
@@ -166,7 +158,7 @@ export default function AnuncioDeFretes() {
       description: "Transporte de produtos químicos industriais com certificação ANTT",
       requirements: ["Certificação MOPP", "Equipamentos de segurança", "Escolta obrigatória"],
       contact: {
-        phone: "(51) 98765-1234",
+        phone: "(63) 99274-8276",
         email: "seguranca@safecargo.com.br",
       },
     },
@@ -182,7 +174,7 @@ export default function AnuncioDeFretes() {
       description: "Transporte de carnes e produtos congelados",
       requirements: ["Caminhão frigorífico", "Temperatura -18°C", "Rastreamento GPS"],
       contact: {
-        phone: "(92) 99123-4567",
+        phone: "(63) 99274-8276",
         email: "operacional@amazonfrio.com.br",
       },
     },
@@ -198,7 +190,7 @@ export default function AnuncioDeFretes() {
       description: "Transporte de mercadorias gerais para distribuição",
       requirements: ["Caminhão toco", "Documentação em dia"],
       contact: {
-        phone: "(81) 98234-5678",
+        phone: "(63) 99274-8276",
         email: "nordeste@nordestecargas.com.br",
       },
     },
@@ -211,10 +203,10 @@ export default function AnuncioDeFretes() {
       color: "bg-yellow-100 text-yellow-800",
       company: "Centro-Oeste Transportes",
       deliveryDate: "19/01/2025",
-      description: "Transporte de móveis e objetos decorativos",
+      description: "Transporte de móveis e objects decorativos",
       requirements: ["Caminhão baú", "Embalagem reforçada", "Cuidado no manuseio"],
       contact: {
-        phone: "(62) 97345-6789",
+        phone: "(63) 99274-8276",
         email: "atendimento@centrooeste.com.br",
       },
     },
@@ -230,7 +222,7 @@ export default function AnuncioDeFretes() {
       description: "Transporte de frutas e verduras frescas",
       requirements: ["Caminhão refrigerado", "Temperatura 8-12°C", "Entrega matinal"],
       contact: {
-        phone: "(27) 99456-7890",
+        phone: "(63) 99274-8276",
         email: "fresh@vitoriafresh.com.br",
       },
     },
@@ -318,87 +310,6 @@ export default function AnuncioDeFretes() {
     setWeightRange({ min: "", max: "" })
     setSelectedRegion("Todas")
   }
-
-  const handleDriverLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (email === TEST_USER.email && password === TEST_USER.password) {
-      login({
-        name: TEST_USER.name,
-        email: TEST_USER.email,
-        phone: TEST_USER.phone,
-        cnh: TEST_USER.cnh,
-        vehicleType: TEST_USER.vehicleType,
-        cpf: TEST_USER.cpf,
-        profileComplete: TEST_USER.profileComplete,
-        profileCompletionPending: TEST_USER.profileCompletionPending,
-      })
-      setDriverLoginModalOpen(false)
-      setLoginError("")
-      setEmail("")
-      setPassword("")
-      // setIsLoggedIn(true)
-      router.refresh()
-    } else {
-      setLoginError("Email ou senha incorretos. Use: motorista@test.com / senha123")
-    }
-  }
-
-  const handleGoogleSignIn = () => {
-    login({
-      name: "Login com Google",
-      email: "google@test.com",
-      phone: "",
-      cnh: "",
-      vehicleType: "",
-      cpf: "000.000.000-00",
-      profileComplete: false,
-      profileCompletionPending: true,
-    })
-    setDriverLoginModalOpen(false)
-    // setIsLoggedIn(true)
-    router.refresh()
-  }
-
-  const handleRegistration = (e: React.FormEvent) => {
-    e.preventDefault()
-    setRegistrationError("")
-
-    if (!regName || !regCpf || !regPassword || !regConfirmPassword) {
-      setRegistrationError("Por favor, preencha todos os campos")
-      return
-    }
-
-    if (regPassword !== regConfirmPassword) {
-      setRegistrationError("As senhas não coincidem")
-      return
-    }
-
-    if (regPassword.length < 6) {
-      setRegistrationError("A senha deve ter pelo menos 6 caracteres")
-      return
-    }
-
-    // Register with minimal data and set profile as incomplete
-    login({
-      name: regName,
-      cpf: regCpf,
-      profileComplete: false,
-      profileCompletionPending: true,
-    })
-
-    setRegistrationSuccess(true)
-
-    setTimeout(() => {
-      setRegistrationModalOpen(false)
-      setRegistrationSuccess(false)
-      setRegName("")
-      setRegCpf("")
-      setRegPassword("")
-      setRegConfirmPassword("")
-      router.refresh()
-    }, 2000)
-  }
-  // </CHANGE>
 
   const handleCreateAccountClick = () => {
     setDriverLoginModalOpen(false)
@@ -656,29 +567,28 @@ export default function AnuncioDeFretes() {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredFreights.slice(0, 6).map((freight, index) => {
-                // Generate a random risk level just for visual variety in this redesign context
-                const risks = ["Baixo", "Médio", "Alto"];
-                const riskColors = {
-                  "Baixo": "bg-emerald-50 text-emerald-700 border-emerald-100",
-                  "Médio": "bg-amber-50 text-amber-700 border-amber-100",
-                  "Alto": "bg-rose-50 text-rose-700 border-rose-100"
-                };
-                const risk = risks[index % 3];
-
-                return (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {(isLoggedIn ? filteredFreights : filteredFreights.slice(0, 3)).map((freight, index) => (
                   <motion.div
                     key={index}
                     whileHover={{ y: -8 }}
                     className="group bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(37,99,235,0.1)] transition-all duration-500 overflow-hidden"
                   >
                     <div className="p-8">
-                      <div className="flex items-center justify-between mb-8">
-                        <div className={`px-4 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest ${riskColors[risk as keyof typeof riskColors]}`}>
-                          Risco {risk}
+                      <div className="flex items-center justify-between gap-4 mb-8">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="flex-shrink-0 w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-500 border border-gray-100">
+                            <Building2 className="w-5 h-5" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Contratante</p>
+                            <p className="font-bold text-gray-900 text-sm leading-tight truncate">{freight.company}</p>
+                          </div>
                         </div>
-                        <div className="text-2xl font-bold text-gray-900 tracking-tight">{freight.value}</div>
+                        <div className="text-2xl font-bold text-gray-900 tracking-tight shrink-0 whitespace-nowrap">
+                          {isLoggedIn ? freight.value : "R$ *****"}
+                        </div>
                       </div>
 
                       <div className="relative space-y-6 pl-8">
@@ -726,9 +636,43 @@ export default function AnuncioDeFretes() {
                       </div>
                     </div>
                   </motion.div>
-                );
-              })}
-            </div>
+                ))}
+
+              </div>
+
+              {!isLoggedIn && filteredFreights.length > 3 && (
+                <div className="mt-16 flex justify-center">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 md:p-10 text-white flex flex-col md:flex-row items-center gap-8 shadow-2xl shadow-blue-200/50 relative overflow-hidden group border border-white/20 w-full max-w-4xl"
+                  >
+                    <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000" />
+                    <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000" />
+
+                    <div className="relative z-10 flex-shrink-0 w-20 h-20 bg-white/15 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-inner">
+                      <Lock className="w-10 h-10 text-white" />
+                    </div>
+
+                    <div className="relative z-10 flex-grow text-center md:text-left">
+                      <h3 className="text-2xl font-bold mb-2 tracking-tight">Desbloqueie todos os fretes e oportunidades</h3>
+                      <p className="text-blue-100 font-medium opacity-90 leading-relaxed max-w-lg">
+                        Cadastre-se ou faça login agora para acessar a rede completa de fretes verificados e turbinar sua operação.
+                      </p>
+                    </div>
+
+                    <div className="relative z-10 flex-shrink-0 w-full md:w-auto">
+                      <Button
+                        onClick={() => setDriverLoginModalOpen(true)}
+                        className="w-full md:w-auto bg-white text-blue-700 hover:bg-blue-50 font-black px-10 py-7 h-auto rounded-2xl text-lg shadow-xl hover:scale-105 active:scale-95 transition-all"
+                      >
+                        Acessar Agora
+                      </Button>
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
@@ -774,38 +718,7 @@ export default function AnuncioDeFretes() {
       </section>
 
       {/* Footer Simplified */}
-      <footer className="py-20 bg-gray-50 border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-12">
-            <div className="max-w-xs text-center md:text-left">
-              <img src="/logo.svg" alt="MovixFlow" className="h-8 mb-6 mx-auto md:mx-0" />
-              <p className="text-gray-500 font-medium">Tecnologia inteligente para gestão de risco e performance logística nacional.</p>
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-12 text-gray-600 font-semibold">
-              <a href="#" className="hover:text-blue-600 transition-colors">Produto</a>
-              <a href="#" className="hover:text-blue-600 transition-colors">Soluções</a>
-              <a href="#" className="hover:text-blue-600 transition-colors">Preços</a>
-              <a href="#" className="hover:text-blue-600 transition-colors">Blog</a>
-            </div>
-
-            <div className="flex gap-4">
-              {/* Social icons could go here */}
-              <div className="w-10 h-10 bg-gray-200 rounded-full" />
-              <div className="w-10 h-10 bg-gray-200 rounded-full" />
-              <div className="w-10 h-10 bg-gray-200 rounded-full" />
-            </div>
-          </div>
-
-          <div className="mt-20 pt-10 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-6 text-gray-400 text-sm font-medium">
-            <p>© 2025 MovixFlow Logística Humana S.A.</p>
-            <div className="flex gap-8">
-              <a href="#">Privacidade</a>
-              <a href="#">Termos</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Advanced Filters Modal */}
       {isAdvancedFiltersOpen && (
@@ -1451,278 +1364,12 @@ export default function AnuncioDeFretes() {
         </div>
       )}
 
-      <Dialog open={driverLoginModalOpen} onOpenChange={setDriverLoginModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <div className="flex flex-col items-center gap-3 mb-2">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                <Truck className="w-7 h-7 text-white" />
-              </div>
-              <DialogTitle className="text-xl font-bold text-center text-gray-900">Login - Motorista</DialogTitle>
-            </div>
-          </DialogHeader>
-
-          <div className="space-y-6 py-4">
-            {loginError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600 text-center">{loginError}</p>
-              </div>
-            )}
-
-            <Button
-              type="button"
-              onClick={handleGoogleSignIn}
-              variant="outline"
-              className="w-full h-12 border-2 border-gray-300 hover:bg-gray-50 font-semibold text-gray-700 flex items-center justify-center gap-3 bg-transparent"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66 2.84.81-.62z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-              </svg>
-              Continuar com Google
-            </Button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500 font-medium">ou</span>
-              </div>
-            </div>
-
-            <form onSubmit={handleDriverLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="driver-email" className="text-gray-900 font-medium">
-                  Email
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="driver-email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="driver-password" className="text-gray-900 font-medium">
-                  Senha
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="driver-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Digite sua senha"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <button type="button" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                  Esqueceu sua senha?
-                </button>
-              </div>
-
-              <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold">
-                Entrar
-              </Button>
-
-              <div className="text-center text-sm text-gray-600">
-                Não tem uma conta?{" "}
-                <button
-                  type="button"
-                  onClick={handleCreateAccountClick}
-                  className="text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  Criar conta
-                </button>
-              </div>
-            </form>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={registrationModalOpen} onOpenChange={setRegistrationModalOpen}>
-        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center">
-                <User className="w-10 h-10 text-white" />
-              </div>
-            </div>
-            <DialogTitle className="text-2xl font-bold text-center text-gray-900">Criar Conta - Motorista</DialogTitle>
-            <DialogDescription className="text-center text-gray-600">
-              Cadastro rápido - Complete seu perfil depois
-              {/* </CHANGE> */}
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={handleRegistration} className="space-y-4 py-4">
-            {registrationError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600 text-center">{registrationError}</p>
-              </div>
-            )}
-
-            {registrationSuccess && (
-              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-600 text-center font-medium">
-                  Conta criada! Você pode completar seu perfil depois.
-                  {/* </CHANGE> */}
-                </p>
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="reg-name" className="text-gray-900 font-medium">
-                Nome Completo *
-              </Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  id="reg-name"
-                  type="text"
-                  placeholder="João Silva"
-                  value={regName}
-                  onChange={(e) => setRegName(e.target.value)}
-                  className="pl-10 h-12 border-gray-300 focus:border-green-500 focus:ring-green-500"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="reg-cpf" className="text-gray-900 font-medium">
-                CPF *
-              </Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  id="reg-cpf"
-                  type="text"
-                  placeholder="000.000.000-00"
-                  value={regCpf}
-                  onChange={(e) => setRegCpf(e.target.value)}
-                  className="pl-10 h-12 border-gray-300 focus:border-green-500 focus:ring-green-500"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="reg-password" className="text-gray-900 font-medium">
-                Senha *
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  id="reg-password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Mínimo 6 caracteres"
-                  value={regPassword}
-                  onChange={(e) => setRegPassword(e.target.value)}
-                  className="pl-10 pr-10 h-12 border-gray-300 focus:border-green-500 focus:ring-green-500"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="reg-confirm-password" className="text-gray-900 font-medium">
-                Confirmar Senha *
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  id="reg-confirm-password"
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Digite a senha novamente"
-                  value={regConfirmPassword}
-                  onChange={(e) => setRegConfirmPassword(e.target.value)}
-                  className="pl-10 pr-10 h-12 border-gray-300 focus:border-green-500 focus:ring-green-500"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-xs text-blue-800">
-                💡 <strong>Dica:</strong> Após criar sua conta, você poderá completar seu perfil com informações
-                adicionais como CNH, veículo, documentos, etc.
-              </p>
-            </div>
-            {/* </CHANGE> */}
-
-            <Button
-              type="submit"
-              className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-semibold"
-              disabled={registrationSuccess}
-            >
-              Criar Conta
-            </Button>
-
-            <div className="text-center text-sm text-gray-600">
-              Já tem uma conta?{" "}
-              <button
-                type="button"
-                onClick={() => {
-                  setRegistrationModalOpen(false)
-                  setDriverLoginModalOpen(true)
-                }}
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Fazer login
-              </button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <DriverAuthModals
+        loginOpen={driverLoginModalOpen}
+        setLoginOpen={setDriverLoginModalOpen}
+        regOpen={registrationModalOpen}
+        setRegOpen={setRegistrationModalOpen}
+      />
 
       {/* Removed login prompt modal */}
       {/* {isLoginPromptOpen && (
