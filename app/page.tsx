@@ -484,7 +484,7 @@ export default function MovixFlowLanding() {
       </section>
 
       {/* Pricing - Strategic Value Focus */}
-      <section id="pricing" className="py-32 bg-slate-50">
+      <section id="pricing" className="py-32 bg-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-24">
             <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-6 tracking-tight">
@@ -499,7 +499,7 @@ export default function MovixFlowLanding() {
             {/* Essential Plan */}
             <div className="flex flex-col bg-white p-8 rounded-[2rem] border border-gray-200 hover:shadow-xl transition-all h-full">
               <div className="mb-8">
-                <h3 className="text-xl font-bold text-gray-400 uppercase tracking-widest mb-4">Controle Operacional</h3>
+                <h3 className="text-xl font-bold text-gray-400 uppercase tracking-widest mb-4">Plan Basic</h3>
                 <div className="flex items-baseline gap-1">
                   <span className="text-5xl font-black text-gray-900">R$ 67</span>
                   <span className="text-gray-500 font-bold">/mês</span>
@@ -533,7 +533,7 @@ export default function MovixFlowLanding() {
               </div>
 
               <div className="mb-8 mt-4">
-                <h3 className="text-xl font-bold text-blue-100 uppercase tracking-widest mb-4">Eficiência & Risco</h3>
+                <h3 className="text-xl font-bold text-blue-100 uppercase tracking-widest mb-4">Plan Standard</h3>
                 <div className="flex items-baseline gap-1">
                   <span className="text-5xl font-black">R$ 670</span>
                   <span className="text-blue-200 font-bold">/mês</span>
@@ -571,7 +571,7 @@ export default function MovixFlowLanding() {
             {/* Enterprise Plan */}
             <div className="flex flex-col bg-white p-8 rounded-[2rem] border border-gray-200 hover:shadow-xl transition-all h-full">
               <div className="mb-8">
-                <h3 className="text-xl font-bold text-gray-400 uppercase tracking-widest mb-4">Governança & Global</h3>
+                <h3 className="text-xl font-bold text-gray-400 uppercase tracking-widest mb-4">Plan Professional</h3>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-black text-gray-900 italic">Sob consulta</span>
                 </div>

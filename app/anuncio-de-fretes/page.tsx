@@ -32,7 +32,7 @@ import {
   Zap,
 } from "lucide-react"
 import { Header } from "@/components/header"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -42,6 +42,8 @@ import { useUser } from "@/contexts/user-context"
 import { toast } from "sonner"
 import { DriverAuthModals } from "@/components/driver-auth-modals"
 import { Footer } from "@/components/footer"
+import { getAllFreight } from "@/src/service/Freight/GetAllFreight"
+import type { IGetAllFreightsResponse } from "@/src/service/Freight/GetAllFreight/get-all-freight"
 
 type Freight = {
   origin: string
@@ -86,6 +88,8 @@ export default function AnuncioDeFretes() {
   const [priceRange, setPriceRange] = useState({ min: "", max: "" })
   const [weightRange, setWeightRange] = useState({ min: "", max: "" })
   const [selectedRegion, setSelectedRegion] = useState("Todas")
+  const [apiFreights, setApiFreights] = useState<Freight[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const [registrationError, setRegistrationError] = useState("")
   const [registrationSuccess, setRegistrationSuccess] = useState(false)
@@ -97,136 +101,6 @@ export default function AnuncioDeFretes() {
   //   setIsLoggedIn(loggedIn)
   // }, [])
 
-  const freights: Freight[] = [
-    {
-      origin: "São Paulo, SP",
-      destination: "Rio de Janeiro, RJ",
-      cargoType: "Normal",
-      value: "R$ 3.500",
-      weight: "15 ton",
-      color: "bg-gray-100 text-gray-800",
-      company: "Transportadora São Paulo Ltda",
-      deliveryDate: "15/01/2025",
-      description: "Transporte de materiais de construção para obra residencial",
-      requirements: ["Caminhão truck", "Lona para cobertura", "Motorista com experiência"],
-      contact: {
-        phone: "(63) 99274-8276",
-        email: "contato@transportadorasp.com.br",
-      },
-    },
-    {
-      origin: "Curitiba, PR",
-      destination: "Florianópolis, SC",
-      cargoType: "Frágil",
-      value: "R$ 4.200",
-      weight: "8 ton",
-      color: "bg-yellow-100 text-yellow-800",
-      company: "Logística Sul Express",
-      deliveryDate: "18/01/2025",
-      description: "Transporte de equipamentos eletrônicos e vidros temperados",
-      requirements: ["Caminhão baú", "Sistema de amarração especial", "Seguro obrigatório"],
-      contact: {
-        phone: "(63) 99274-8276",
-        email: "operacoes@sulexpress.com.br",
-      },
-    },
-    {
-      origin: "Belo Horizonte, MG",
-      destination: "Salvador, BA",
-      cargoType: "Perecível",
-      value: "R$ 5.800",
-      weight: "12 ton",
-      color: "bg-green-100 text-green-800",
-      company: "FreshLog Transportes",
-      deliveryDate: "12/01/2025",
-      description: "Transporte de alimentos perecíveis para rede de supermercados",
-      requirements: ["Caminhão refrigerado", "Temperatura controlada 2-8°C", "Entrega expressa"],
-      contact: {
-        phone: "(63) 99274-8276",
-        email: "fresh@freshlog.com.br",
-      },
-    },
-    {
-      origin: "Porto Alegre, RS",
-      destination: "Brasília, DF",
-      cargoType: "Perigosa",
-      value: "R$ 8.500",
-      weight: "10 ton",
-      color: "bg-red-100 text-red-800",
-      company: "SafeCargo Transportes Especiais",
-      deliveryDate: "20/01/2025",
-      description: "Transporte de produtos químicos industriais com certificação ANTT",
-      requirements: ["Certificação MOPP", "Equipamentos de segurança", "Escolta obrigatória"],
-      contact: {
-        phone: "(63) 99274-8276",
-        email: "seguranca@safecargo.com.br",
-      },
-    },
-    {
-      origin: "Manaus, AM",
-      destination: "Belém, PA",
-      cargoType: "Refrigerada",
-      value: "R$ 6.900",
-      weight: "18 ton",
-      color: "bg-blue-100 text-blue-800",
-      company: "AmazonFrio Logística",
-      deliveryDate: "22/01/2025",
-      description: "Transporte de carnes e produtos congelados",
-      requirements: ["Caminhão frigorífico", "Temperatura -18°C", "Rastreamento GPS"],
-      contact: {
-        phone: "(63) 99274-8276",
-        email: "operacional@amazonfrio.com.br",
-      },
-    },
-    {
-      origin: "Recife, PE",
-      destination: "Fortaleza, CE",
-      cargoType: "Normal",
-      value: "R$ 2.800",
-      weight: "6 ton",
-      color: "bg-gray-100 text-gray-800",
-      company: "Nordeste Cargas",
-      deliveryDate: "16/01/2025",
-      description: "Transporte de mercadorias gerais para distribuição",
-      requirements: ["Caminhão toco", "Documentação em dia"],
-      contact: {
-        phone: "(63) 99274-8276",
-        email: "nordeste@nordestecargas.com.br",
-      },
-    },
-    {
-      origin: "Goiânia, GO",
-      destination: "Cuiabá, MT",
-      cargoType: "Frágil",
-      value: "R$ 3.900",
-      weight: "5 ton",
-      color: "bg-yellow-100 text-yellow-800",
-      company: "Centro-Oeste Transportes",
-      deliveryDate: "19/01/2025",
-      description: "Transporte de móveis e objects decorativos",
-      requirements: ["Caminhão baú", "Embalagem reforçada", "Cuidado no manuseio"],
-      contact: {
-        phone: "(63) 99274-8276",
-        email: "atendimento@centrooeste.com.br",
-      },
-    },
-    {
-      origin: "Vitória, ES",
-      destination: "Belo Horizonte, MG",
-      cargoType: "Perecível",
-      value: "R$ 4.500",
-      weight: "9 ton",
-      color: "bg-green-100 text-green-800",
-      company: "VitóriaFresh Logística",
-      deliveryDate: "14/01/2025",
-      description: "Transporte de frutas e verduras frescas",
-      requirements: ["Caminhão refrigerado", "Temperatura 8-12°C", "Entrega matinal"],
-      contact: {
-        phone: "(63) 99274-8276",
-        email: "fresh@vitoriafresh.com.br",
-      },
-    },
-  ]
 
   const cargoTypes = [
     { name: "Todos", color: "bg-gray-100 text-gray-800", activeColor: "bg-gray-200" },
@@ -237,7 +111,43 @@ export default function AnuncioDeFretes() {
     { name: "Refrigerada", color: "bg-blue-100 text-blue-800", activeColor: "bg-blue-200" },
   ]
 
-  const filteredFreights = freights.filter((freight) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true)
+        const data = await getAllFreight()
+        const mappedData: Freight[] = data.map((item: IGetAllFreightsResponse) => ({
+          origin: `${item.origemCidade}, ${item.origemUf}`,
+          destination: `${item.destinoCidade}, ${item.destinoUf}`,
+          cargoType: item.tipoCarga,
+          value: (item.valorFreteCentavos / 100).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          }),
+          weight: `${item.pesoEstimadoTon} ton`,
+          color: "bg-gray-100 text-gray-800",
+          company: item.empresaNome,
+          deliveryDate: new Date(item.previsaoEntrega).toLocaleDateString("pt-BR"),
+          description: item.descricaoAdicional || `Publicado em ${new Date(item.publicadoEm).toLocaleDateString("pt-BR")}`,
+          requirements: [],
+          contact: {
+            phone: item.telefoneWhatsapp || "(63) 99274-8276",
+            email: item.emailOperacional || "contato@movixflow.com.br",
+          },
+        }))
+        setApiFreights(mappedData)
+      } catch (error) {
+        console.error("Erro ao carregar fretes:", error)
+        toast.error("Não foi possível carregar os fretes em tempo real.")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  const filteredFreights = apiFreights.filter((freight) => {
     // Search filter
     const matchesSearch =
       searchQuery === "" ||
