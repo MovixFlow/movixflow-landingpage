@@ -1,0 +1,20 @@
+export interface CrlvDadosBasicos {
+  placa: string | null
+  renavam: string | null
+  chassi: string | null
+  numeroCrlv: string | null
+  marcaModelo: string | null
+  anoFabricacao: string | null
+  anoModelo: string | null
+  tipo: string | null
+  categoria: string | null
+  cor: string | null
+  combustivel: string | null
+  carroceria: string | null
+  capacidadeCarga: string | null
+  pesoBrutoTotal: string | null
+  nomeProprietario: string | null
+  cpfCnpjProprietario: string | null
+  localEmissao: string | null
+  dataEmissao: string | null
+}
