@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
       method: "POST",
       body: JSON.stringify({
         items: [{ id: productId, quantity: 1 }],
-        returnUrl: `${APP_URL}/#pricing`,
+        returnUrl: `${APP_URL}/`,
         completionUrl: `${APP_URL}/pagamento-confirmado`,
         methods: ["PIX", "CARD"],
       }),
