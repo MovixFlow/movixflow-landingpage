@@ -62,17 +62,6 @@ type Freight = {
   }
 }
 
-const TEST_USER = {
-  email: "motorista@test.com",
-  password: "senha123",
-  name: "João Silva",
-  phone: "(63) 99274-8276",
-  cnh: "12345678900",
-  vehicleType: "Caminhão Baú",
-  cpf: "123.456.789-00",
-  profileComplete: false,
-  profileCompletionPending: true,
-}
 
 export default function AnuncioDeFretes() {
   const [selectedFreight, setSelectedFreight] = useState<Freight | null>(null)
