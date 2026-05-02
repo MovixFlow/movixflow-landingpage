@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -37,30 +37,27 @@ import {
   Car,
   FileText,
   ChevronDown,
+  UserPlus,
+  ShieldCheck,
+  ClipboardList,
 } from "lucide-react"
 import { FacialRecognition } from "@/components/facial-recognition"
 import { useUser } from "@/contexts/user-context"
+import { useCliente } from "@/contexts/cliente-context"
 import { DriverAuthModals } from "@/components/driver-auth-modals"
+import { CadastroModal } from "@/components/cadastro-modal"
+import { ClienteAuthModal } from "@/components/cliente-auth-modal"
+import { ClienteProfileModal } from "@/components/cliente-profile-modal"
 
-const TEST_USER = {
-  email: "motorista@test.com",
-  password: "senha123",
-  name: "João Silva",
-  phone: "(11) 98765-4321",
-  cnh: "12345678900",
-  vehicleType: "Caminhão Baú",
-  vehiclePlate: "ABC-1234",
-  cpf: "000.000.000-00",
-  profileComplete: true,
-  profileCompletionPending: false,
-}
 
 export function Header() {
   const router = useRouter()
   const pathname = usePathname()
   const { isLoggedIn, driverData, login, logout, updateDriverData, faceData, setFaceData } = useUser()
+  const { isClienteLogado, clienteData, logoutCliente } = useCliente()
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [clienteMenuOpen, setClienteMenuOpen] = useState(false)
   const [loginModalOpen, setLoginModalOpen] = useState(false)
   const [driverLoginModalOpen, setDriverLoginModalOpen] = useState(false)
   const [registrationModalOpen, setRegistrationModalOpen] = useState(false)
@@ -70,6 +67,9 @@ export function Header() {
   const [loginError, setLoginError] = useState("")
   const [registrationError, setRegistrationError] = useState("")
   const [registrationSuccess, setRegistrationSuccess] = useState(false)
+  const [cadastroModalOpen, setCadastroModalOpen] = useState(false)
+  const [clienteModalOpen, setClienteModalOpen] = useState(false)
+  const [clienteProfileModalOpen, setClienteProfileModalOpen] = useState(false)
 
   const [showFacialRecognition, setShowFacialRecognition] = useState(false)
   const [facialRecognitionMode, setFacialRecognitionMode] = useState<"register" | "verify">("register")
@@ -122,7 +122,17 @@ export function Header() {
   const [showRegPassword, setShowRegPassword] = useState(false)
   const [showRegConfirmPassword, setShowRegConfirmPassword] = useState(false)
 
-  // Removed useEffects that relied on localStorage
+  // Abre o modal de cliente automaticamente quando redirecionado de página protegida
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get("cliente") === "login" && !isClienteLogado) {
+      setClienteModalOpen(true)
+      // Remove o param da URL sem recarregar a página
+      params.delete("cliente")
+      const newSearch = params.toString()
+      window.history.replaceState(null, "", newSearch ? `?${newSearch}` : window.location.pathname)
+    }
+  }, [isClienteLogado])
 
   const handleLoginClick = () => {
     setLoginModalOpen(true)
@@ -140,42 +150,10 @@ export function Header() {
 
   const handleDriverLogin = (e: React.FormEvent, data: any) => {
     e.preventDefault()
-    if (data.email === TEST_USER.email && data.password === TEST_USER.password) {
-      login({
-        name: TEST_USER.name,
-        email: data.email,
-        phone: TEST_USER.phone,
-        cnh: TEST_USER.cnh,
-        vehicleType: TEST_USER.vehicleType,
-        vehiclePlate: TEST_USER.vehiclePlate,
-        cpf: TEST_USER.cpf,
-        profileComplete: TEST_USER.profileComplete,
-        profileCompletionPending: TEST_USER.profileCompletionPending,
-      })
-      setDriverLoginModalOpen(false)
-      setLoginError("")
-      router.push("/anuncio-de-fretes")
-    } else {
-      setLoginError("Email ou senha incorretos. Use: motorista@test.com / senha123")
-    }
+    setLoginError("Autenticação de motorista não disponível no momento.")
+
   }
 
-  const handleGoogleSignIn = () => {
-    login({
-      name: "Usuário Google",
-      email: "motorista@gmail.com",
-      phone: "(11) 99999-9999",
-      cnh: "00000000000",
-      vehicleType: "Caminhão",
-      vehiclePlate: "GPX-0000",
-      cpf: "000.000.000-00",
-      profileComplete: true,
-      profileCompletionPending: false,
-      // Include other fields if available in the context
-    })
-    setDriverLoginModalOpen(false)
-    router.push("/anuncio-de-fretes")
-  }
 
   const handleRegistration = (e: React.FormEvent, data: any) => {
     e.preventDefault()
@@ -225,21 +203,7 @@ export function Header() {
     } else if (facialRecognitionMode === "verify") {
       // Facial login successful
       if (driverData) {
-        login(driverData) // Re-login with existing driver data to ensure state is set
-      } else {
-        // Fallback to test user if somehow driverData is not available
-        login({
-          name: TEST_USER.name,
-          email: TEST_USER.email,
-          phone: TEST_USER.phone,
-          cnh: TEST_USER.cnh,
-          vehicleType: TEST_USER.vehicleType,
-          vehiclePlate: TEST_USER.vehiclePlate,
-          faceData: imageData, // This would be the verified face data
-          cpf: TEST_USER.cpf,
-          profileComplete: TEST_USER.profileComplete,
-          profileCompletionPending: TEST_USER.profileCompletionPending,
-        })
+        login(driverData)
       }
 
       setShowFacialRecognition(false)
@@ -294,9 +258,9 @@ export function Header() {
       setEditDriverClassification((driverData.driverClassification as any) || "autonomo")
       setEditCompanyName(driverData.companyName || "")
       setEditCompanyCnpj(driverData.companyCnpj || "")
-      setEditName(driverData.name || TEST_USER.name)
-      setEditEmail(driverData.email || TEST_USER.email)
-      setEditPhone(driverData.phone || TEST_USER.phone)
+      setEditName(driverData.name || "")
+      setEditEmail(driverData.email || "")
+      setEditPhone(driverData.phone || "")
       setEditCpf(driverData.cpf || "")
       setEditRg(driverData.rg || "")
       setEditBirthDate(driverData.birthDate || "")
@@ -304,20 +268,12 @@ export function Header() {
       setEditAddress(driverData.address || "")
       setEditMotherName(driverData.motherName || "")
       setEditFatherName(driverData.fatherName || "")
-      setEditCnh(driverData.cnh || TEST_USER.cnh)
+      setEditCnh(driverData.cnh || "")
       setEditCnhValidity(driverData.cnhValidity || "")
       setEditCnhCategory(driverData.cnhCategory || "")
-      setEditVehicleType(driverData.vehicleType || TEST_USER.vehicleType)
-      setEditVehiclePlate(driverData.vehiclePlate || TEST_USER.vehiclePlate)
+      setEditVehicleType(driverData.vehicleType || "")
+      setEditVehiclePlate(driverData.vehiclePlate || "")
       setEditResponsibleEmployee(driverData.responsibleEmployee || "")
-    } else {
-      // Load test user data as fallback
-      setEditName(TEST_USER.name)
-      setEditEmail(TEST_USER.email)
-      setEditPhone(TEST_USER.phone)
-      setEditCnh(TEST_USER.cnh)
-      setEditVehicleType(TEST_USER.vehicleType)
-      setEditVehiclePlate(TEST_USER.vehiclePlate)
     }
   }
 
@@ -391,18 +347,20 @@ export function Header() {
     ? [
       { name: "Anúncio de Fretes", href: "/anuncio-de-fretes" },
     ]
+    : isClienteLogado
+    ? []
     : navigation
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/98 backdrop-blur-md shadow-sm">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-100">
+        <nav className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
               <img src="/logo.svg" alt="MovixFlow" className="h-7 sm:h-9 w-auto" />
             </Link>
 
-            <div className="hidden md:flex items-center gap-10">
+            <div className="hidden md:flex items-center gap-8">
               {filteredNavigation.map((item) => (
                 <Link
                   key={item.name}
@@ -415,82 +373,88 @@ export function Header() {
             </div>
 
             <div className="hidden md:flex items-center gap-4 relative">
-              {isLoggedIn ? (
+              {/* ── Motorista logado ── */}
+              {isLoggedIn && (
                 <div className="relative">
-                  <Button
-                    variant="ghost"
-                    className="flex items-center gap-3 hover:bg-gray-50 px-4 py-2 rounded-xl transition-all"
-                    onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                  >
+                  <Button variant="ghost" className="flex items-center gap-3 hover:bg-gray-50 px-4 py-2 rounded-xl transition-all" onClick={() => setProfileMenuOpen(!profileMenuOpen)}>
                     <Avatar className="w-9 h-9 ring-2 ring-gray-100 shadow-sm">
-                      <AvatarFallback className="bg-gradient-to-br from-blue-600 to-blue-700 text-white text-sm font-black tracking-tighter">
-                        {getUserInitials()}
-                      </AvatarFallback>
+                      <AvatarFallback className="bg-gradient-to-br from-blue-600 to-blue-700 text-white text-sm font-black tracking-tighter">{getUserInitials()}</AvatarFallback>
                     </Avatar>
                     <span className="text-gray-900 font-bold text-sm tracking-tight">{driverData?.name || "Motorista"}</span>
                     <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${profileMenuOpen ? "rotate-180" : ""}`} />
                   </Button>
-
                   <AnimatePresence>
                     {profileMenuOpen && (
                       <>
-                        <div
-                          className="fixed inset-0 z-40"
-                          onClick={() => setProfileMenuOpen(false)}
-                        />
-                        <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                          className="absolute right-0 mt-3 w-64 bg-white border border-gray-100 rounded-[1.5rem] shadow-2xl p-2 z-50 overflow-hidden"
-                        >
+                        <div className="fixed inset-0 z-40" onClick={() => setProfileMenuOpen(false)} />
+                        <motion.div initial={{ opacity:0, y:10, scale:0.95 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, y:10, scale:0.95 }} className="absolute right-0 mt-3 w-64 bg-white border border-gray-100 rounded-[1.5rem] shadow-2xl p-2 z-50 overflow-hidden">
                           <div className="px-4 py-3 border-b border-gray-50 mb-1">
                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Gestão de Conta</p>
                             <p className="text-xs text-gray-500 font-medium truncate">{driverData?.email}</p>
                           </div>
-
-                          <button
-                            onClick={() => {
-                              setProfileModalOpen(true)
-                              setProfileMenuOpen(false)
-                            }}
-                            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-xl transition-all"
-                          >
-                            <UserCircle className="w-4 h-4 text-blue-500" />
-                            Meu Perfil
+                          <button onClick={() => { setProfileModalOpen(true); setProfileMenuOpen(false) }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-xl transition-all">
+                            <UserCircle className="w-4 h-4 text-blue-500" />Meu Perfil
                           </button>
-
-                          <button
-                            onClick={() => {
-                              router.push("/anuncio-de-fretes")
-                              setProfileMenuOpen(false)
-                            }}
-                            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-xl transition-all"
-                          >
-                            <Truck className="w-4 h-4 text-gray-400" />
-                            Fretes Disponíveis
+                          <button onClick={() => { router.push("/anuncio-de-fretes"); setProfileMenuOpen(false) }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-xl transition-all">
+                            <Truck className="w-4 h-4 text-gray-400" />Fretes Disponíveis
                           </button>
-
                           <div className="h-px bg-gray-50 my-1 mx-2" />
-
-                          <button
-                            onClick={() => {
-                              handleLogout()
-                              setProfileMenuOpen(false)
-                            }}
-                            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition-all"
-                          >
-                            <LogOut className="w-4 h-4" />
-                            Sair do Sistema
+                          <button onClick={() => { handleLogout(); setProfileMenuOpen(false) }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition-all">
+                            <LogOut className="w-4 h-4" />Sair do Sistema
                           </button>
                         </motion.div>
                       </>
                     )}
                   </AnimatePresence>
                 </div>
-              ) : (
+              )}
+
+              {/* ── Cliente logado ── */}
+              {!isLoggedIn && isClienteLogado && clienteData && (
+                <div className="relative">
+                  <Button variant="ghost" className="flex items-center gap-3 hover:bg-indigo-50 px-4 py-2 rounded-xl transition-all" onClick={() => setClienteMenuOpen(!clienteMenuOpen)}>
+                    <Avatar className="w-9 h-9 ring-2 ring-indigo-100 shadow-sm">
+                      <AvatarFallback className="bg-gradient-to-br from-indigo-600 to-violet-700 text-white text-sm font-black tracking-tighter">
+                        {clienteData.nome.split(" ").map(n => n[0]).join("").toUpperCase().slice(0,2)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-gray-900 font-bold text-sm tracking-tight">{clienteData.nome.split(" ")[0]}</span>
+                    <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${clienteMenuOpen ? "rotate-180" : ""}`} />
+                  </Button>
+                  <AnimatePresence>
+                    {clienteMenuOpen && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setClienteMenuOpen(false)} />
+                        <motion.div initial={{ opacity:0, y:10, scale:0.95 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, y:10, scale:0.95 }} className="absolute right-0 mt-3 w-72 bg-white border border-gray-100 rounded-[1.5rem] shadow-2xl p-2 z-50 overflow-hidden">
+                          <div className="px-4 py-3 border-b border-gray-50 mb-1">
+                            <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Área do Cliente</p>
+                            <p className="text-sm font-bold text-gray-800 truncate">{clienteData.nome}</p>
+                            <p className="text-xs text-gray-400 truncate">{clienteData.email}</p>
+                          </div>
+                          {clienteData.empresaVinculadaNome && (
+                            <div className="mx-3 my-1 px-3 py-2 bg-emerald-50 rounded-xl border border-emerald-100">
+                              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-0.5">Empresa vinculada</p>
+                              <p className="text-xs font-semibold text-emerald-800">{clienteData.empresaVinculadaNome}</p>
+                            </div>
+                          )}
+                          <div className="h-px bg-gray-50 my-1 mx-2" />
+                          <button onClick={() => { setClienteMenuOpen(false); setClienteProfileModalOpen(true); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-indigo-600 rounded-xl transition-all">
+                            <UserCircle className="w-4 h-4 text-indigo-500" />Meu Perfil
+                          </button>
+                          <button onClick={() => { logoutCliente(); setClienteMenuOpen(false) }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition-all">
+                            <LogOut className="w-4 h-4" />Sair
+                          </button>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+
+              {/* ── Nenhum logado ── */}
+              {!isLoggedIn && !isClienteLogado && (
                 <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-5 py-2 h-auto rounded-lg shadow-sm hover:shadow-md transition-all"
                   onClick={handleLoginClick}
                 >
                   Entrar
@@ -611,6 +575,24 @@ export function Header() {
                 <p className="text-sm text-gray-600">Acesse fretes e gerencie suas viagens</p>
               </div>
             </button>
+
+            <button
+              onClick={() => {
+                setLoginModalOpen(false)
+                setClienteModalOpen(true)
+              }}
+              className="group relative flex items-center gap-4 p-6 rounded-xl border-2 border-gray-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all duration-200"
+            >
+              <div className="flex-shrink-0 w-14 h-14 bg-indigo-100 group-hover:bg-indigo-600 rounded-xl flex items-center justify-center transition-colors">
+                <Users className="w-7 h-7 text-indigo-600 group-hover:text-white transition-colors" />
+              </div>
+              <div className="flex-1 text-left">
+                <h3 className="font-semibold text-lg text-gray-900 group-hover:text-indigo-600 transition-colors">
+                  Sou Cliente
+                </h3>
+                <p className="text-sm text-gray-600">Solicite e acompanhe consultas de risco</p>
+              </div>
+            </button>
           </div>
         </DialogContent>
       </Dialog>
@@ -622,6 +604,21 @@ export function Header() {
         setRegOpen={setRegistrationModalOpen}
         customHandleLogin={handleDriverLogin}
         customHandleRegister={handleRegistration}
+      />
+
+      <CadastroModal
+        open={cadastroModalOpen}
+        onOpenChange={setCadastroModalOpen}
+      />
+
+      <ClienteAuthModal
+        open={clienteModalOpen}
+        onOpenChange={setClienteModalOpen}
+      />
+
+      <ClienteProfileModal
+        open={clienteProfileModalOpen}
+        onOpenChange={setClienteProfileModalOpen}
       />
 
       <Dialog open={showFacialRecognition} onOpenChange={setShowFacialRecognition}>
@@ -719,7 +716,7 @@ export function Header() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="p-4 bg-gray-50 rounded-lg">
                       <Label className="text-xs text-gray-600 uppercase font-semibold">Nome Completo</Label>
-                      <p className="text-gray-900 font-medium mt-1">{driverData?.name || TEST_USER.name}</p>
+                      <p className="text-gray-900 font-medium mt-1">{driverData?.name || ""}</p>
                     </div>
 
                     {driverData?.cpf && (
@@ -772,7 +769,7 @@ export function Header() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <div className="p-4 bg-gray-50 rounded-lg">
                       <Label className="text-xs text-gray-600 uppercase font-semibold">CNH (nº de registro)</Label>
-                      <p className="text-gray-900 font-medium mt-1">{driverData?.cnh || TEST_USER.cnh}</p>
+                      <p className="text-gray-900 font-medium mt-1">{driverData?.cnh || ""}</p>
                     </div>
 
                     {driverData?.cnhValidity && (
@@ -801,12 +798,12 @@ export function Header() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="p-4 bg-gray-50 rounded-lg">
                       <Label className="text-xs text-gray-600 uppercase font-semibold">Email</Label>
-                      <p className="text-gray-900 font-medium mt-1">{driverData?.email || TEST_USER.email}</p>
+                      <p className="text-gray-900 font-medium mt-1">{driverData?.email || ""}</p>
                     </div>
 
                     <div className="p-4 bg-gray-50 rounded-lg">
                       <Label className="text-xs text-gray-600 uppercase font-semibold">Telefone</Label>
-                      <p className="text-gray-900 font-medium mt-1">{driverData?.phone || TEST_USER.phone}</p>
+                      <p className="text-gray-900 font-medium mt-1">{driverData?.phone || ""}</p>
                     </div>
 
                     {driverData?.address && (
@@ -832,11 +829,11 @@ export function Header() {
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <Label className="text-xs text-gray-600 uppercase font-semibold">Tipo de Veículo</Label>
-                    <p className="text-gray-900 font-medium mt-1">{driverData?.vehicleType || TEST_USER.vehicleType}</p>
+                    <p className="text-gray-900 font-medium mt-1">{driverData?.vehicleType || ""}</p>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <Label className="text-xs text-gray-600 uppercase font-semibold">Placa do Veículo</Label>
-                    <p className="text-gray-900 font-medium mt-1">{driverData?.vehiclePlate || TEST_USER.vehiclePlate}</p>
+                    <p className="text-gray-900 font-medium mt-1">{driverData?.vehiclePlate || ""}</p>
                   </div>
                 </div>
 
