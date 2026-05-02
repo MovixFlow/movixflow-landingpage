@@ -24,6 +24,7 @@ export default function Checkout({ productId }: CheckoutProps) {
     try {
       const clientSecret = await startCheckoutSession(productId)
       console.log("[v0] Client secret received:", !!clientSecret)
+      if (!clientSecret) throw new Error("Client secret não retornado pela sessão de checkout")
       return clientSecret
     } catch (error) {
       console.error("[v0] Error fetching client secret:", error)
