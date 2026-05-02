@@ -26,9 +26,11 @@ import {
     Navigation,
     Building,
     ArrowRight,
-    X
+    X,
+    ShieldCheck
 } from "lucide-react"
 import { motion } from "framer-motion"
+import { useRouter } from "next/navigation"
 
 const moduleCategories = [
     {
@@ -70,6 +72,14 @@ const moduleCategories = [
             { name: "Controle de Escoltas", desc: "Monitoramento de iscas e equipes.", icon: Radio },
             { name: "Escoltas Disponíveis", desc: "Marketplace de segurança patrimonial.", icon: ShieldAlert },
         ]
+    },
+    {
+        name: "Compliance & Risco",
+        color: "from-indigo-500 to-purple-600",
+        modules: [
+            { name: "Nova Consulta de Risco", desc: "Validação preditiva com múltiplas fontes PGFN e ANTT.", icon: ShieldCheck, href: "/solicitar-consulta" },
+            { name: "Acompanhar Consultas", desc: "Dashboard de status e histórico de liberações aprovadas.", icon: ClipboardList, href: "/acompanhar" },
+        ]
     }
 ]
 
@@ -79,6 +89,8 @@ interface ModalAllModulesProps {
 }
 
 export function ModalAllModules({ isOpen, onClose }: ModalAllModulesProps) {
+    const router = useRouter()
+
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="w-[95vw] sm:max-w-7xl h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-3xl border-gray-100 p-0 rounded-3xl sm:rounded-[3rem] shadow-3xl scrollbar-hide overflow-x-hidden">
@@ -115,13 +127,19 @@ export function ModalAllModules({ isOpen, onClose }: ModalAllModulesProps) {
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
-                                    {category.modules.map((module, modIdx) => (
+                                    {category.modules.map((module: any, modIdx) => (
                                         <motion.div
                                             key={modIdx}
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: modIdx * 0.05 + catIdx * 0.1 }}
-                                            className="group relative p-6 sm:p-8 bg-gray-50/50 rounded-2xl sm:rounded-3xl border border-gray-100 hover:bg-white hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-500 min-h-[220px] flex flex-col justify-between"
+                                            onClick={() => {
+                                                if (module.href) {
+                                                    router.push(module.href)
+                                                    onClose()
+                                                }
+                                            }}
+                                            className={`group relative p-6 sm:p-8 bg-gray-50/50 rounded-2xl sm:rounded-3xl border border-gray-100 min-h-[220px] flex flex-col justify-between transition-all duration-500 hover:bg-white hover:shadow-2xl hover:shadow-blue-100/50 ${module.href ? "cursor-pointer active:scale-95" : ""}`}
                                         >
                                             <div>
                                                 <div className={`w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br ${category.color} rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg shadow-blue-200 group-hover:scale-110 group-hover:rotate-3 transition-transform`}>
