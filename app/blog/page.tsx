@@ -1,5 +1,20 @@
-"use client"
+import type { Metadata } from "next"
 
+export const metadata: Metadata = {
+  title: "Blog MovixFlow | Gestão de Riscos e Logística para Transportadoras",
+  description:
+    "Artigos, tendências e melhores práticas em gestão logística, redução de riscos, biometria de motoristas e business intelligence para transportadoras brasileiras.",
+  alternates: { canonical: "https://site.movixflow.com.br/blog" },
+  openGraph: {
+    title: "Blog MovixFlow | Insights em Logística e Gestão de Riscos",
+    description:
+      "Conteúdo especializado em gestão de riscos logísticos, tecnologia para transportadoras e inteligência operacional.",
+    url: "https://site.movixflow.com.br/blog",
+  },
+}
+
+import Image from "next/image"
+import Link from "next/link"
 import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,6 +24,7 @@ import { Calendar, Clock, ArrowRight, Search, Tag, TrendingUp, Shield, Truck } f
 export default function BlogPage() {
   const posts = [
     {
+      slug: "como-reduzir-riscos-logisticos",
       title: "Como reduzir riscos logísticos em 65%",
       excerpt:
         "Descubra as estratégias que empresas líderes estão usando para minimizar incidentes e aumentar a segurança.",
@@ -20,6 +36,7 @@ export default function BlogPage() {
       color: "blue",
     },
     {
+      slug: "futuro-logistica-ia-preditiva",
       title: "O futuro da logística com IA preditiva",
       excerpt: "Inteligência artificial está revolucionando a forma como prevemos e evitamos problemas operacionais.",
       category: "Tecnologia",
@@ -30,6 +47,7 @@ export default function BlogPage() {
       color: "purple",
     },
     {
+      slug: "gestao-de-fretes-melhores-praticas",
       title: "Gestão de fretes: melhores práticas",
       excerpt: "Aprenda como otimizar sua operação de fretes e conectar-se com motoristas confiáveis.",
       category: "Operações",
@@ -40,6 +58,7 @@ export default function BlogPage() {
       color: "orange",
     },
     {
+      slug: "seguranca-transporte-cargas",
       title: "Segurança em transporte de cargas",
       excerpt: "Protocolos essenciais para garantir a segurança de cargas de alto valor e perecíveis.",
       category: "Segurança",
@@ -50,6 +69,7 @@ export default function BlogPage() {
       color: "red",
     },
     {
+      slug: "monitoramento-tempo-real",
       title: "Monitoramento em tempo real: guia completo",
       excerpt: "Como implementar sistemas de rastreamento e monitoramento eficazes para sua frota.",
       category: "Tecnologia",
@@ -60,6 +80,7 @@ export default function BlogPage() {
       color: "green",
     },
     {
+      slug: "analise-dados-logistica-eficiente",
       title: "Análise de dados para logística eficiente",
       excerpt: "Transforme dados em insights acionáveis para melhorar sua operação logística.",
       category: "Análise",
@@ -130,54 +151,51 @@ export default function BlogPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post, index) => (
-              <Card
-                key={index}
-                className="border-0 shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2 group"
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={post.image || "/placeholder.svg"}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div
-                    className={`absolute top-4 left-4 bg-${post.color}-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2`}
-                  >
-                    <post.icon className="w-4 h-4" />
-                    {post.category}
-                  </div>
-                </div>
-
-                <CardHeader>
-                  <CardTitle className="text-xl text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-                    {post.title}
-                  </CardTitle>
-                  <CardDescription className="text-gray-600 line-clamp-3 leading-relaxed">
-                    {post.excerpt}
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      {post.date}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
-                      {post.readTime}
+              <Link key={index} href={`/blog/${post.slug}`} className="group block">
+                <Card className="border-0 shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2 h-full">
+                  <div className="relative h-48 overflow-hidden">
+                    <Image
+                      src={post.image || "/placeholder.svg"}
+                      alt={post.title}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div
+                      className={`absolute top-4 left-4 bg-${post.color}-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2`}
+                    >
+                      <post.icon className="w-4 h-4" />
+                      {post.category}
                     </div>
                   </div>
 
-                  <Button
-                    variant="ghost"
-                    className="w-full text-blue-600 hover:text-blue-700 hover:bg-blue-50 group/btn"
-                  >
-                    Ler mais
-                    <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                  </Button>
-                </CardContent>
-              </Card>
+                  <CardHeader>
+                    <CardTitle className="text-xl text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                      {post.title}
+                    </CardTitle>
+                    <CardDescription className="text-gray-600 line-clamp-3 leading-relaxed">
+                      {post.excerpt}
+                    </CardDescription>
+                  </CardHeader>
+
+                  <CardContent>
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        {post.date}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        {post.readTime}
+                      </div>
+                    </div>
+
+                    <div className="w-full flex items-center justify-center text-blue-600 hover:text-blue-700 font-medium text-sm py-2">
+                      Ler mais
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
 

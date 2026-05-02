@@ -31,10 +31,11 @@ import {
 } from "lucide-react"
 import { Header } from "@/components/header"
 import { useCliente } from "@/contexts/cliente-context"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 import { ModalAllModules } from "@/components/modal-all-modules"
 import { Footer } from "@/components/footer"
 import Link from "next/link"
+import Image from "next/image"
 
 // ─── Fade-in wrapper ──────────────────────────────────────────────────────────
 
@@ -47,12 +48,13 @@ function FadeIn({
   delay?: number
   className?: string
 }) {
+  const reduce = useReducedMotion()
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={reduce ? false : { opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay }}
+      transition={reduce ? { duration: 0 } : { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay }}
       className={className}
     >
       {children}
@@ -539,9 +541,12 @@ export default function MovixFlowLanding() {
 
                 {/* Dashboard card */}
                 <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-2xl shadow-gray-300/30">
-                  <img
+                  <Image
                     src="/dashboard-showcase.png"
-                    alt="MovixFlow Dashboard Showcase"
+                    alt="Dashboard MovixFlow — Gestão de Riscos e Logística em tempo real"
+                    width={1200}
+                    height={750}
+                    priority
                     className="w-full h-auto block"
                   />
                 </div>
@@ -989,6 +994,116 @@ export default function MovixFlowLanding() {
         </div>
       </section>
 
+      {/* ── FAQ ── */}
+      <section className="py-28 px-4">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: "O que é gestão de riscos logísticos?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Gestão de riscos logísticos é o conjunto de práticas e tecnologias para identificar, avaliar e mitigar ameaças à operação de transporte rodoviário. Inclui validação de motoristas, monitoramento de frotas em tempo real, controle de jornada e análise preditiva de sinistros. Transportadoras que adotam gestão estruturada de riscos reduzem incidentes em até 65% no primeiro ano.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Como funciona a validação biométrica de motoristas?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "A validação biométrica usa reconhecimento facial para confirmar que o motorista que inicia a viagem é quem está cadastrado e autorizado. No momento do embarque, o motorista faz uma selfie que é comparada com a foto registrada no cadastro. O sistema verifica também a validade da CNH, histórico de infrações e score de risco antes de liberar o embarque.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "O MovixFlow integra com TMS e ERP?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Sim. O MovixFlow oferece API REST para integração com os principais sistemas TMS e ERP do mercado brasileiro, incluindo Totvs, SAP e Oracle. A integração permite sincronização automática de motoristas, rotas, documentos e KPIs de risco. O plano Professional inclui suporte dedicado de implantação e customização da integração.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Qual a diferença entre motorista de frota, agregado e autônomo?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Motorista de frota é funcionário CLT da transportadora e opera veículo da empresa. Motorista agregado é proprietário do próprio veículo e trabalha em regime de parceria com a transportadora. Motorista autônomo (TAC) é contratado por viagem, sem vínculo fixo. O MovixFlow gerencia os três perfis com processos de validação e monitoramento adaptados para cada tipo.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "O MovixFlow está em conformidade com a LGPD?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Sim. O MovixFlow trata dados pessoais e biométricos de motoristas em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei 13.709/2018). Os dados são coletados com base legal de execução de contrato e legítimo interesse de segurança, armazenados com criptografia e acessíveis apenas por usuários autorizados. Consulte nossa Política de Privacidade para detalhes.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Quanto custa o MovixFlow?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "O MovixFlow tem três planos: Basic (R$ 67/mês para 1 usuário e até 50 motoristas), Standard (R$ 670/mês para 10 usuários e motoristas ilimitados) e Professional (sob consulta para embarcadores com volume ilimitado e integração API). Não há taxa de setup e o contrato pode ser cancelado a qualquer momento.",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
+        <div className="max-w-3xl mx-auto">
+          <FadeIn>
+            <div className="text-center mb-14">
+              <span className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-4 block">
+                Perguntas frequentes
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4">
+                Dúvidas sobre o MovixFlow
+              </h2>
+              <p className="text-gray-500 text-lg">
+                Respostas rápidas para as perguntas mais comuns de gestores e transportadoras.
+              </p>
+            </div>
+          </FadeIn>
+
+          <div className="space-y-4">
+            {[
+              {
+                q: "O que é gestão de riscos logísticos?",
+                a: "Gestão de riscos logísticos é o conjunto de práticas e tecnologias para identificar, avaliar e mitigar ameaças à operação de transporte. Inclui validação de motoristas, monitoramento de frotas em tempo real, controle de jornada e análise preditiva de sinistros. Transportadoras que adotam gestão estruturada de riscos reduzem incidentes em até 65% no primeiro ano.",
+              },
+              {
+                q: "Como funciona a validação biométrica de motoristas?",
+                a: "A validação usa reconhecimento facial para confirmar que o motorista autorizado está conduzindo. No embarque, o motorista faz uma selfie comparada ao cadastro. O sistema verifica CNH, histórico de infrações e score de risco antes de liberar o embarque — eliminando documentos fraudulentos e o uso de terceiros.",
+              },
+              {
+                q: "O MovixFlow integra com TMS e ERP?",
+                a: "Sim. Oferecemos API REST para integração com os principais sistemas do mercado brasileiro, incluindo Totvs, SAP e Oracle. A integração sincroniza motoristas, rotas, documentos e KPIs de risco automaticamente. O plano Professional inclui suporte dedicado de implantação.",
+              },
+              {
+                q: "O MovixFlow está em conformidade com a LGPD?",
+                a: "Sim. Tratamos dados pessoais e biométricos em conformidade com a Lei 13.709/2018 (LGPD). Os dados são coletados com base legal adequada, armazenados com criptografia e acessíveis apenas por usuários autorizados. Mantemos política de privacidade detalhada e DPO disponível para consulta.",
+              },
+              {
+                q: "Quanto custa e como funciona o cancelamento?",
+                a: "O Basic custa R$ 67/mês (1 usuário, até 50 motoristas) e o Standard R$ 670/mês (10 usuários, ilimitado). Não há taxa de setup, nem contrato de fidelidade — cancele quando quiser sem multa. O plano Professional é sob consulta para embarcadores com volume ilimitado.",
+              },
+            ].map((item, i) => (
+              <FadeIn key={i} delay={i * 0.06}>
+                <div className="bg-white border border-gray-100 rounded-2xl p-7 hover:border-gray-200 hover:shadow-md transition-all">
+                  <h3 className="text-base font-bold text-gray-900 mb-3">{item.q}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">{item.a}</p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── CTA FINAL ── */}
       <section id="contato" className="py-28 px-4">
         <div className="max-w-5xl mx-auto">
@@ -1012,16 +1127,26 @@ export default function MovixFlowLanding() {
                   <Button
                     size="lg"
                     className="bg-white text-gray-900 hover:bg-gray-100 font-bold px-8 py-4 h-auto rounded-xl text-base shadow-lg transition-all"
+                    asChild
                   >
-                    Agendar reunião estratégica
-                    <ArrowRight className="ml-2 w-4 h-4" />
+                    <Link href="/contato">
+                      Agendar reunião estratégica
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </Link>
                   </Button>
                   <Button
                     size="lg"
                     variant="ghost"
                     className="text-gray-400 hover:text-white hover:bg-white/10 font-bold px-8 py-4 h-auto rounded-xl text-base transition-all border border-white/10"
+                    asChild
                   >
-                    Falar com especialista
+                    <a
+                      href="https://wa.me/5563992748276?text=Olá! Gostaria de falar com um especialista MovixFlow."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Falar com especialista
+                    </a>
                   </Button>
                 </div>
               </div>

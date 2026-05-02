@@ -1,8 +1,13 @@
 "use client"
 
+import type { Metadata } from "next"
 import Link from "next/link"
 import { CheckCircle2, ArrowRight, Shield, Truck } from "lucide-react"
 import { motion } from "framer-motion"
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+}
 
 export default function PagamentoConfirmadoPage() {
   return (

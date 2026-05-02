@@ -333,8 +333,9 @@ export function Header() {
 
   const navigation = [
     { name: "Benefícios", href: "/#beneficios" },
+    { name: "Blog", href: "/blog" },
+    { name: "Sobre", href: "/sobre" },
     { name: "Anúncio de Fretes", href: "/anuncio-de-fretes" },
-    { name: "Depoimentos", href: "/#depoimentos" },
     { name: "Contato", href: "/#contato" },
   ]
 

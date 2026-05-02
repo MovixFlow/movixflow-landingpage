@@ -1,4 +1,16 @@
-"use client"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Carreiras MovixFlow | Trabalhe Conosco",
+  description:
+    "Faça parte do time MovixFlow. Vagas em tecnologia, produto e operações para quem quer transformar a logística brasileira com inovação e propósito.",
+  alternates: { canonical: "https://site.movixflow.com.br/carreiras" },
+  openGraph: {
+    title: "Carreiras MovixFlow | Trabalhe Conosco",
+    description: "Junte-se ao time que está transformando a gestão de riscos logísticos no Brasil.",
+    url: "https://site.movixflow.com.br/carreiras",
+  },
+}
 
 import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"

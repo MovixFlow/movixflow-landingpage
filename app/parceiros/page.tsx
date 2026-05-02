@@ -1,4 +1,17 @@
-"use client"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Parceiros MovixFlow | Ecossistema de Tecnologia Logística",
+  description:
+    "Conheça os parceiros estratégicos da MovixFlow. Integrações com TMS, ERP e soluções complementares para transportadoras e embarcadores brasileiros.",
+  alternates: { canonical: "https://site.movixflow.com.br/parceiros" },
+  openGraph: {
+    title: "Parceiros MovixFlow | Ecossistema Logístico",
+    description:
+      "Parcerias estratégicas que potencializam a gestão de riscos e logística para transportadoras.",
+    url: "https://site.movixflow.com.br/parceiros",
+  },
+}
 
 import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"

@@ -1,4 +1,17 @@
-"use client"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Contato MovixFlow | Fale com Nossa Equipe de Especialistas",
+  description:
+    "Entre em contato com a MovixFlow. WhatsApp, e-mail contato@movixflow.com.br ou formulário online. Resposta em até 24h. São Paulo - SP.",
+  alternates: { canonical: "https://site.movixflow.com.br/contato" },
+  openGraph: {
+    title: "Contato MovixFlow | Fale com Nossa Equipe",
+    description:
+      "Entre em contato pelo WhatsApp, e-mail ou formulário. Nossa equipe responde em até 24h.",
+    url: "https://site.movixflow.com.br/contato",
+  },
+}
 
 import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"

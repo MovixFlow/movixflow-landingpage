@@ -34,15 +34,17 @@ export function Footer() {
                         </p>
                         <div className="flex gap-4">
                             {[
-                                { icon: Facebook, href: "#", label: "Facebook" },
-                                { icon: Instagram, href: "#", label: "Instagram" },
-                                { icon: Linkedin, href: "#", label: "LinkedIn" },
-                                { icon: Youtube, href: "#", label: "YouTube" },
+                                { icon: Facebook, href: "https://www.facebook.com/movixflow", label: "Facebook" },
+                                { icon: Instagram, href: "https://www.instagram.com/movixflow", label: "Instagram" },
+                                { icon: Linkedin, href: "https://www.linkedin.com/company/movixflow", label: "LinkedIn" },
+                                { icon: Youtube, href: "https://www.youtube.com/@movixflow", label: "YouTube" },
                             ].map((social, i) => (
                                 <a
                                     key={i}
                                     href={social.href}
                                     aria-label={social.label}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 hover:scale-110 transition-all border border-gray-100 hover:border-blue-100"
                                 >
                                     <social.icon className="w-5 h-5" />
@@ -56,11 +58,18 @@ export function Footer() {
                         <div>
                             <h4 className="font-bold text-gray-900 uppercase text-xs tracking-[0.2em] mb-8">Navegação</h4>
                             <ul className="space-y-4">
-                                {["Home", "Produto", "Soluções", "Preços", "Blog"].map((link) => (
-                                    <li key={link}>
-                                        <Link href="#" className="text-gray-500 hover:text-blue-600 font-semibold transition-colors flex items-center group">
+                                {[
+                                    { label: "Home", href: "/" },
+                                    { label: "Produto", href: "/#beneficios" },
+                                    { label: "Soluções", href: "/#modulos" },
+                                    { label: "Preços", href: "/#pricing" },
+                                    { label: "Blog", href: "/blog" },
+                                    { label: "Embarcadores", href: "/embarcadores" },
+                                ].map((item) => (
+                                    <li key={item.label}>
+                                        <Link href={item.href} className="text-gray-500 hover:text-blue-600 font-semibold transition-colors flex items-center group">
                                             <ArrowRight className="w-4 h-4 mr-0 opacity-0 -ml-4 group-hover:mr-2 group-hover:opacity-100 transition-all" />
-                                            {link}
+                                            {item.label}
                                         </Link>
                                     </li>
                                 ))}
@@ -69,11 +78,17 @@ export function Footer() {
                         <div>
                             <h4 className="font-bold text-gray-900 uppercase text-xs tracking-[0.2em] mb-8">Suporte</h4>
                             <ul className="space-y-4">
-                                {["Ajuda", "Documentação", "Privacidade", "Termos", "Contato"].map((link) => (
-                                    <li key={link}>
-                                        <Link href="#" className="text-gray-500 hover:text-blue-600 font-semibold transition-colors flex items-center group">
+                                {[
+                                    { label: "Sobre", href: "/sobre" },
+                                    { label: "Carreiras", href: "/carreiras" },
+                                    { label: "Parceiros", href: "/parceiros" },
+                                    { label: "Privacidade", href: "#" },
+                                    { label: "Contato", href: "/#contato" },
+                                ].map((item) => (
+                                    <li key={item.label}>
+                                        <Link href={item.href} className="text-gray-500 hover:text-blue-600 font-semibold transition-colors flex items-center group">
                                             <ArrowRight className="w-4 h-4 mr-0 opacity-0 -ml-4 group-hover:mr-2 group-hover:opacity-100 transition-all" />
-                                            {link}
+                                            {item.label}
                                         </Link>
                                     </li>
                                 ))}
