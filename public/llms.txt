@@ -1,0 +1,56 @@
+# MovixFlow
+
+> Plataforma B2B de gestão de riscos logísticos para transportadoras brasileiras.
+> Combina validação biométrica de motoristas, monitoramento em tempo real, BI executivo
+> e marketplace de fretes com validação cadastral completa.
+
+## Produto
+
+MovixFlow é um SaaS voltado para transportadoras, embarcadores e gestores logísticos
+que precisam reduzir sinistros, validar motoristas e monitorar operações.
+
+### Módulos principais
+
+- **Gestão de Riscos**: biometria facial, alertas preditivos 24/7, perfil de motorista,
+  análise de sinistralidade
+- **Gestão Operacional**: roteirização inteligente, telemetria, controle de jornada,
+  manutenção preventiva
+- **Marketplace Seguro**: fretes com motoristas validados, auditoria constante, sistema
+  de rating
+- **BI & Inteligência**: dashboards executivos, KPIs de risco, análise de ROI,
+  relatórios de performance
+
+## Dados relevantes
+
+- 12.000+ consultas de risco processadas
+- 98% taxa de precisão nas validações
+- 65% redução média de incidentes em clientes ativos
+- 1.200+ empresas clientes
+- Operação em 15+ estados brasileiros
+- Fundada em 2020
+
+## Planos e preços
+
+- **Basic**: R$ 67/mês — 1 usuário, até 50 motoristas, monitoramento básico
+- **Standard**: R$ 670/mês — 10 usuários, motoristas ilimitados, BI avançado,
+  alertas WhatsApp, suporte 24/7
+- **Professional**: sob consulta — volume ilimitado, embarcadores, API TMS/ERP,
+  gerente dedicado
+
+## Integrações
+
+API REST para integração com TMS (sistemas de gestão de transporte) e ERP.
+Compatível com principais sistemas do mercado brasileiro.
+
+## Páginas principais
+
+- Homepage: https://site.movixflow.com.br/
+- Sobre: https://site.movixflow.com.br/sobre
+- Blog: https://site.movixflow.com.br/blog
+- Contato: https://site.movixflow.com.br/contato
+- Anúncio de Fretes: https://site.movixflow.com.br/anuncio-de-fretes
+
+## Contato
+
+- E-mail: contato@movixflow.com.br
+- WhatsApp: +55 63 99274-8276
