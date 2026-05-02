@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from "next/server"
 
 const ABACATE_KEY = process.env.ABACATEPAY_API_KEY ?? ""
-const APP_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "")
 const BASE = "https://api.abacatepay.com/v2"
+
+function resolveAppUrl(req: NextRequest): string {
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "")
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`
+  }
+  const host = req.headers.get("host") ?? "localhost:3000"
+  const proto = host.startsWith("localhost") ? "http" : "https"
+  return `${proto}://${host}`
+}
 
 type PlanConfig = {
   externalId: string
@@ -85,13 +96,16 @@ export async function POST(req: NextRequest) {
     }
 
     const productId = await getOrCreateProduct(plan)
+    const appUrl = resolveAppUrl(req)
+
+    console.log("[AbacatePay] appUrl:", appUrl)
 
     const checkoutRes = await abacate("/checkouts/create", {
       method: "POST",
       body: JSON.stringify({
         items: [{ id: productId, quantity: 1 }],
-        returnUrl: `${APP_URL}/`,
-        completionUrl: `${APP_URL}/pagamento-confirmado`,
+        returnUrl: `${appUrl}/`,
+        completionUrl: `${appUrl}/pagamento-confirmado`,
         methods: ["PIX", "CARD"],
       }),
     })
