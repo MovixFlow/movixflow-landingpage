@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script"
 import "./globals.css"
 import { UserProvider } from "@/contexts/user-context"
+import { ClienteProvider } from "@/contexts/cliente-context"
 
 const geistSans = GeistSans.variable
 const geistMono = GeistMono.variable
@@ -14,6 +15,9 @@ export const metadata: Metadata = {
   title: "MovixFlow - Conecte sua carga ao motorista certo",
   description: "Plataforma inteligente para gestão de fretes e logística",
   generator: "v0.app",
+  icons: {
+    icon: "/icon.svg",
+  },
 }
 
 import { Toaster } from "sonner"
@@ -30,8 +34,10 @@ export default function RootLayout({
       </head>
       <body className={`${geistSans} ${geistMono} antialiased`}>
         <UserProvider>
-          {children}
-          <Toaster position="top-right" richColors />
+          <ClienteProvider>
+            {children}
+            <Toaster position="top-right" richColors />
+          </ClienteProvider>
         </UserProvider>
         <Analytics />
       </body>
