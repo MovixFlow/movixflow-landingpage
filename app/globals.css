@@ -142,3 +142,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .section-label {
+    @apply text-[10px] font-black text-slate-400 uppercase tracking-widest;
+  }
+}
