@@ -2,7 +2,7 @@ import axios from "axios"
 
 const RISK_API_URL =
   process.env.NODE_ENV === "production"
-    ? "https://api-risk.movixflow.com.br/api"
+    ? "https://risk.movixflow.com.br/api"
     : "http://localhost:5043/api"
 
 export const apiRiskConsult = axios.create({
