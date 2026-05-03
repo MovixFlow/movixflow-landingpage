@@ -40,6 +40,7 @@ export interface ConsultaCompletaPayload {
   observacoesCliente?: string
   idEmpresaExecutor: string
   idEmpresaSolicitante: string
+  nomeEmpresaSolicitante?: string
   clienteUsuarioId: string
   motorista: MotoristaPayload
   veiculos: VeiculoPayload[]
@@ -51,6 +52,7 @@ export interface ConsultaMotoristaPayload {
   observacoesCliente?: string
   idEmpresaExecutor: string
   idEmpresaSolicitante: string
+  nomeEmpresaSolicitante?: string
   clienteUsuarioId: string
   motorista: MotoristaPayload
   veiculos: []
@@ -62,6 +64,7 @@ export interface ConsultaVeiculoPayload {
   observacoesCliente?: string
   idEmpresaExecutor: string
   idEmpresaSolicitante: string
+  nomeEmpresaSolicitante?: string
   clienteUsuarioId: string
   motorista: null
   veiculos: VeiculoPayload[]

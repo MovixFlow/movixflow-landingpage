@@ -365,13 +365,14 @@ export default function SolicitarConsultaPage() {
       const payload = {
         foco,
         formato,
-        observacoesCliente:   values.observacoes ?? "",
-        idEmpresaExecutor:    idEmpresaExecutor!,
-        idEmpresaSolicitante: idEmpresaSolicitante || idEmpresaExecutor!,
-        clienteUsuarioId:     clienteData.id,
-        motorista:            motorista as any,
+        observacoesCliente:      values.observacoes ?? "",
+        idEmpresaExecutor:       idEmpresaExecutor!,
+        idEmpresaSolicitante:    idEmpresaSolicitante || idEmpresaExecutor!,
+        nomeEmpresaSolicitante:  clienteData?.razaoSocial || clienteData?.nome || "",
+        clienteUsuarioId:        clienteData.id,
+        motorista:               motorista as any,
         veiculos,
-        idempotencyKey:       idempotencyKeyRef.current,
+        idempotencyKey:          idempotencyKeyRef.current,
       } as CriarConsultaPayload
 
       const res = await criarConsulta(payload)
