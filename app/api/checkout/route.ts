@@ -95,10 +95,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Plano inválido." }, { status: 400 })
     }
 
-    const productId = await getOrCreateProduct(plan)
     const appUrl = resolveAppUrl(req)
 
-    console.log("[AbacatePay] appUrl:", appUrl)
+    if (appUrl.startsWith("http://localhost")) {
+      return NextResponse.json(
+        { error: "Checkout indisponível em ambiente local. Acesse via URL pública para testar o pagamento." },
+        { status: 422 }
+      )
+    }
+
+    const productId = await getOrCreateProduct(plan)
 
     const checkoutRes = await abacate("/checkouts/create", {
       method: "POST",
