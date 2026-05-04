@@ -113,58 +113,69 @@ const features = [
 const plans = [
   {
     key: "basic" as const,
-    name: "Basic",
-    price: "R$ 67",
+    name: "Starter",
+    price: "R$ 197",
+    annualPrice: "R$ 157",
+    annualSaving: "R$ 480",
     period: "/mês",
-    sub: "1 usuário · Até 50 motoristas",
+    sub: "1 usuário · Até 30 motoristas",
     highlight: false,
     badge: null,
+    eyebrow: "Para começar com estrutura",
     features: [
-      "Checklist Digital & Documentos",
-      "Monitoramento Real-time Básico",
-      "Gestão de Motoristas",
-      "Suporte via Chat",
-      "Marketplace de Fretes",
+      "Checklist digital — elimine papel e retrabalho",
+      "Monitoramento básico de frota em tempo real",
+      "Gestão de motoristas (até 30)",
+      "Marketplace de fretes",
+      "Suporte via chat",
     ],
-    btnLabel: "Começar agora",
+    btnLabel: "Testar grátis por 7 dias",
     action: "checkout" as const,
   },
   {
     key: "standard" as const,
-    name: "Standard",
+    name: "Growth",
     price: "R$ 670",
+    annualPrice: "R$ 536",
+    annualSaving: "R$ 1.608",
     period: "/mês",
-    sub: "10 usuários · Ilimitado",
+    sub: "Motoristas ilimitados · Até 10 usuários",
     highlight: true,
-    badge: "Mais popular",
+    badge: "Mais Popular",
+    eyebrow: "Para quem quer resultados reais",
     features: [
-      "BI de Sinistralidade Avançado",
-      "Alertas via WhatsApp e E-mail",
-      "Gestão de Manutenção Preventiva",
-      "Prioridade no Marketplace",
-      "KPIs de Performance Exclusivos",
-      "Suporte Priority 24/7",
+      "Tudo do Starter",
+      "Validação biométrica — bloqueie fraudes antes do embarque",
+      "BI de sinistralidade — veja onde está perdendo dinheiro",
+      "Alertas WhatsApp — reaja antes que vire prejuízo",
+      "Manutenção preventiva — evite paradas inesperadas",
+      "KPIs exclusivos de performance",
+      "Suporte prioritário 24/7",
     ],
-    btnLabel: "Falar com especialista",
+    btnLabel: "Começar teste grátis",
     action: "checkout" as const,
   },
   {
     key: "professional" as const,
-    name: "Professional",
+    name: "Enterprise",
     price: "Sob consulta",
+    annualPrice: "Sob consulta",
+    annualSaving: "",
     period: "",
-    sub: "Volume ilimitado · Embarcadores",
+    sub: "Grandes frotas · Embarcadores",
     highlight: false,
     badge: null,
+    eyebrow: "Para operações de grande escala",
     features: [
-      "BI Executivo — CEO View",
-      "API de Integração (TMS/ERP)",
-      "Gerente de Sucesso Dedicado",
-      "Módulos Customizados",
-      "Consultoria de Implantação",
-      "SLA de Resposta Crítica",
+      "Tudo do Growth",
+      "API REST (Totvs, SAP, Oracle)",
+      "Dashboard CEO View — visão executiva consolidada",
+      "Gerente de sucesso dedicado",
+      "Módulos customizados para sua operação",
+      "Consultoria de implantação inclusa",
+      "SLA de resposta crítica",
     ],
-    btnLabel: "Agendar demo",
+    btnLabel: "Agendar demonstração",
     action: "contact" as const,
   },
 ]
@@ -223,6 +234,7 @@ export default function MovixFlowLanding() {
   const { isClienteLogado, clienteData } = useCliente()
   const [showModulesModal, setShowModulesModal] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
+  const [billingAnnual, setBillingAnnual] = useState(false)
 
   const handleCheckout = useCallback(async (plan: "basic" | "standard") => {
     setCheckoutLoading(plan)
@@ -864,72 +876,144 @@ export default function MovixFlowLanding() {
       </section>
 
       {/* ── PRICING ── */}
-      <section id="pricing" className="py-28 px-4 bg-gray-50/60">
-        <div className="max-w-5xl mx-auto">
+      <section id="pricing" className="py-28 px-4 bg-gray-50/60 overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+
+          {/* Âncora de preço */}
           <FadeIn>
-            <div className="text-center mb-16">
+            <div className="flex justify-center mb-14">
+              <div className="inline-flex items-start sm:items-center gap-3 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-3.5 text-sm text-amber-800 font-medium max-w-2xl">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-amber-500 mt-0.5 sm:mt-0" />
+                <span>
+                  Uma única falha operacional pode custar mais de{" "}
+                  <strong>R$&nbsp;5.000</strong>. O MovixFlow previne isso
+                  diariamente — por menos do que uma avaria de pneu.
+                </span>
+              </div>
+            </div>
+          </FadeIn>
+
+          {/* Cabeçalho */}
+          <FadeIn>
+            <div className="text-center mb-10">
               <span className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-4 block">
                 Planos & Preços
               </span>
               <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4">
-                Escolha o plano ideal
+                Invista menos do que um sinistro custa
               </h2>
               <p className="text-gray-500 text-lg max-w-xl mx-auto">
-                Acesso completo à plataforma. Sem taxa de setup, sem surpresas na fatura.
+                Comece grátis. Sem cartão de crédito. Cancele quando quiser.
               </p>
             </div>
           </FadeIn>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+          {/* Toggle mensal / anual */}
+          <FadeIn>
+            <div className="flex items-center justify-center gap-3 mb-12">
+              <span className={cn("text-sm font-medium transition-colors", !billingAnnual ? "text-gray-900" : "text-gray-400")}>
+                Mensal
+              </span>
+              <button
+                type="button"
+                aria-label="Alternar faturamento anual"
+                onClick={() => setBillingAnnual(!billingAnnual)}
+                className={cn(
+                  "relative w-11 h-6 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                  billingAnnual ? "bg-blue-600" : "bg-gray-300"
+                )}
+              >
+                <span
+                  className={cn(
+                    "absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform",
+                    billingAnnual ? "translate-x-5" : "translate-x-0"
+                  )}
+                />
+              </button>
+              <span className={cn("text-sm font-medium flex items-center gap-2 transition-colors", billingAnnual ? "text-gray-900" : "text-gray-400")}>
+                Anual
+                <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                  −20%
+                </span>
+              </span>
+            </div>
+          </FadeIn>
+
+          {/* Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
             {plans.map((plan, i) => (
               <FadeIn key={i} delay={i * 0.08}>
                 <div
                   className={cn(
-                    "bg-white rounded-2xl border-2 p-8 flex flex-col transition-all",
+                    "relative bg-white rounded-2xl border-2 p-8 flex flex-col h-full transition-all",
                     plan.highlight
-                      ? "border-blue-600 shadow-2xl shadow-blue-100 lg:-mt-6 lg:mb-6"
+                      ? "border-blue-600 shadow-2xl shadow-blue-100 lg:-mt-5"
                       : "border-gray-100 hover:border-gray-200 hover:shadow-lg"
                   )}
                 >
+                  {/* Badge flutuante */}
                   {plan.badge && (
-                    <div className="inline-flex items-center gap-1.5 text-xs font-bold bg-blue-600 text-white px-3 py-1 rounded-full mb-5 self-start">
-                      <Award className="w-3 h-3" />
-                      {plan.badge}
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                      <div className="inline-flex items-center gap-1.5 text-xs font-bold bg-blue-600 text-white px-4 py-1.5 rounded-full shadow-lg shadow-blue-200 whitespace-nowrap">
+                        <Zap className="w-3 h-3" />
+                        {plan.badge}
+                      </div>
                     </div>
                   )}
 
-                  <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">
-                    {plan.name}
+                  {/* Eyebrow */}
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+                    {plan.eyebrow}
                   </p>
 
-                  <div className="flex items-end gap-1 mb-1">
-                    <span
-                      className={cn(
-                        "font-black leading-none",
-                        plan.price === "Sob consulta"
-                          ? "text-2xl text-gray-800"
-                          : "text-5xl text-gray-900"
-                      )}
-                    >
-                      {plan.price}
-                    </span>
-                    {plan.period && (
-                      <span className="text-gray-400 font-medium text-sm pb-1">
-                        {plan.period}
-                      </span>
+                  {/* Nome do plano */}
+                  <h3 className="text-xl font-black text-gray-900 mb-5">{plan.name}</h3>
+
+                  {/* Preço */}
+                  <div className="mb-1 min-h-[56px] flex items-end">
+                    {plan.price === "Sob consulta" ? (
+                      <span className="text-2xl font-black text-gray-800">Sob consulta</span>
+                    ) : (
+                      <div className="flex items-end gap-1">
+                        <span className="text-5xl font-black text-gray-900 leading-none">
+                          {billingAnnual ? plan.annualPrice : plan.price}
+                        </span>
+                        <span className="text-gray-400 font-medium text-sm pb-1">/mês</span>
+                      </div>
                     )}
                   </div>
-                  <p className="text-gray-400 text-xs font-medium mb-8">
-                    {plan.sub}
-                  </p>
 
+                  {/* Economia anual */}
+                  <div className="h-5 mb-2">
+                    {plan.annualSaving && billingAnnual && (
+                      <p className="text-xs text-emerald-600 font-semibold">
+                        Cobrado anualmente · Você economiza {plan.annualSaving}/ano
+                      </p>
+                    )}
+                  </div>
+
+                  <p className="text-gray-400 text-xs font-medium mb-8">{plan.sub}</p>
+
+                  {/* Features */}
                   <ul className="space-y-3 mb-8 flex-1">
                     {plan.features.map((feat, j) => (
-                      <li key={j} className="flex items-start gap-2.5 text-sm text-gray-600">
+                      <li
+                        key={j}
+                        className={cn(
+                          "flex items-start gap-2.5 text-sm",
+                          feat === "Tudo do Starter" || feat === "Tudo do Growth"
+                            ? "text-blue-600 font-semibold"
+                            : "text-gray-600"
+                        )}
+                      >
                         <CheckCircle2
                           className={cn(
                             "w-4 h-4 mt-0.5 shrink-0",
-                            plan.highlight ? "text-blue-600" : "text-gray-400"
+                            feat === "Tudo do Starter" || feat === "Tudo do Growth"
+                              ? "text-blue-500"
+                              : plan.highlight
+                              ? "text-blue-600"
+                              : "text-gray-400"
                           )}
                         />
                         {feat}
@@ -937,16 +1021,17 @@ export default function MovixFlowLanding() {
                     ))}
                   </ul>
 
+                  {/* CTA */}
                   {plan.action === "checkout" ? (
                     <button
                       type="button"
                       disabled={checkoutLoading === plan.key}
                       onClick={() => handleCheckout(plan.key as "basic" | "standard")}
                       className={cn(
-                        "w-full rounded-xl font-bold py-3.5 text-sm transition-all cursor-pointer text-white flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed",
+                        "w-full rounded-xl font-bold py-3.5 text-sm transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed",
                         plan.highlight
-                          ? "bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200"
-                          : "bg-gray-900 hover:bg-black"
+                          ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200"
+                          : "bg-gray-900 hover:bg-black text-white"
                       )}
                     >
                       {checkoutLoading === plan.key ? (
@@ -955,41 +1040,60 @@ export default function MovixFlowLanding() {
                           Aguarde…
                         </>
                       ) : (
-                        plan.btnLabel
+                        <>
+                          {plan.btnLabel}
+                          <ArrowRight className="w-4 h-4" />
+                        </>
                       )}
                     </button>
                   ) : (
                     <a
                       href="#contato"
-                      className={cn(
-                        "w-full rounded-xl font-bold py-3.5 text-sm transition-all cursor-pointer text-white flex items-center justify-center gap-2",
-                        "bg-gray-900 hover:bg-black"
-                      )}
+                      className="w-full rounded-xl font-bold py-3.5 text-sm transition-all cursor-pointer text-white flex items-center justify-center gap-2 bg-gray-900 hover:bg-black"
                     >
                       {plan.btnLabel}
+                      <ArrowRight className="w-4 h-4" />
                     </a>
+                  )}
+
+                  {/* Nota de trial */}
+                  {plan.action === "checkout" && (
+                    <p className="text-center text-xs text-gray-400 mt-3">
+                      7 dias grátis · Sem cartão de crédito
+                    </p>
                   )}
                 </div>
               </FadeIn>
             ))}
           </div>
 
-          {/* Garantia */}
+          {/* Reversão de risco */}
           <FadeIn delay={0.2}>
-            <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-gray-400">
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-gray-400">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>7 dias grátis, sem cartão</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                 <span>Sem contrato de fidelidade</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>Cancele quando quiser</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>Cancele quando quiser, sem multa</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>Suporte incluso em todos os planos</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>Suporte humano em todos os planos</span>
               </div>
             </div>
+          </FadeIn>
+
+          {/* Nota de uso variável */}
+          <FadeIn delay={0.3}>
+            <p className="text-center text-xs text-gray-400 mt-6 max-w-lg mx-auto">
+              * Consultas de risco (validação biométrica e score de motorista) são cobradas por uso — somente quando utilizadas.
+            </p>
           </FadeIn>
         </div>
       </section>
