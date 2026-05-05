@@ -84,6 +84,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const planKey = body.plan as string
+    const empresaId = body.empresaId as string | undefined
 
     if (!ABACATE_KEY) {
       return NextResponse.json(
@@ -115,6 +116,7 @@ export async function POST(req: NextRequest) {
         returnUrl: `${appUrl}/`,
         completionUrl: `${appUrl}/pagamento-confirmado`,
         methods: ["CARD"],
+        ...(empresaId ? { metadata: { empresaId } } : {}),
       }),
     })
     const subscriptionData = await subscriptionRes.json()

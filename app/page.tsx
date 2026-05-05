@@ -242,7 +242,7 @@ export default function MovixFlowLanding() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, empresaId: clienteData?.idEmpresa }),
       })
       const data = await res.json()
       if (data.url) {

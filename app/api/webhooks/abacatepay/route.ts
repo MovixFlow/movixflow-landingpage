@@ -2,11 +2,37 @@ import { NextRequest, NextResponse } from "next/server"
 import { createHmac } from "crypto"
 
 const WEBHOOK_SECRET = process.env.ABACATEPAY_WEBHOOK_SECRET ?? ""
+const BILLING_API_URL = process.env.BILLING_API_URL ?? ""
+const BILLING_API_TOKEN = process.env.BILLING_API_TOKEN ?? ""
 
 function verifySignature(payload: string, signature: string): boolean {
   if (!WEBHOOK_SECRET) return true
   const expected = createHmac("sha256", WEBHOOK_SECRET).update(payload).digest("hex")
   return expected === signature
+}
+
+async function atualizarAssinaturaBilling(
+  empresaId: string,
+  assinaturaId: string,
+  plano: string,
+  status: string,
+  dataProximaCobranca?: string
+) {
+  if (!BILLING_API_URL || !empresaId) return
+
+  await fetch(`${BILLING_API_URL}/api/empresa/${empresaId}/assinatura`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${BILLING_API_TOKEN}`,
+    },
+    body: JSON.stringify({
+      assinaturaId,
+      plano,
+      status,
+      dataProximaCobranca: dataProximaCobranca ?? null,
+    }),
+  })
 }
 
 export async function POST(req: NextRequest) {
@@ -20,32 +46,52 @@ export async function POST(req: NextRequest) {
 
     const event = JSON.parse(rawBody) as {
       event: string
-      data: Record<string, unknown>
+      data: Record<string, any>
     }
 
+    const data = event.data
+    const empresaId: string | undefined = data?.metadata?.empresaId
+    const assinaturaId: string = data?.id ?? ""
+    const plano: string = data?.items?.[0]?.product?.externalId
+      ?.replace("movixflow-", "")
+      ?.replace("-mensal", "") ?? ""
+
     switch (event.event) {
-      // Assinatura ativada — primeira cobrança paga
       case "subscription.completed":
-        console.info("[AbacatePay] Assinatura ativada:", event.data)
-        // TODO: ativar acesso do cliente no banco de dados
+        // Assinatura ativada — primeira cobrança paga
+        await atualizarAssinaturaBilling(
+          empresaId!,
+          assinaturaId,
+          plano,
+          "ativa",
+          data?.nextBillingDate
+        )
         break
 
-      // Renovação mensal paga com sucesso
       case "subscription.renewed":
-        console.info("[AbacatePay] Assinatura renovada:", event.data)
-        // TODO: registrar renovação e garantir que o acesso continua ativo
+        // Renovação mensal paga com sucesso
+        await atualizarAssinaturaBilling(
+          empresaId!,
+          assinaturaId,
+          plano,
+          "ativa",
+          data?.nextBillingDate
+        )
         break
 
-      // Assinatura cancelada
       case "subscription.cancelled":
-        console.info("[AbacatePay] Assinatura cancelada:", event.data)
-        // TODO: revogar acesso do cliente no banco de dados
+        // Assinatura cancelada
+        await atualizarAssinaturaBilling(
+          empresaId!,
+          assinaturaId,
+          plano,
+          "cancelada"
+        )
         break
 
-      // Plano trocado (aplica no próximo ciclo)
       case "subscription.plan_changed":
-        console.info("[AbacatePay] Plano alterado:", event.data)
-        // TODO: atualizar plano do cliente no banco de dados
+        // Plano alterado (aplica no próximo ciclo)
+        console.info("[AbacatePay] Plano alterado:", data)
         break
 
       default:
