@@ -25,14 +25,14 @@ type PlanConfig = {
 
 const PLANS: Record<string, PlanConfig> = {
   basic: {
-    externalId: "movixflow-starter-mensal",
+    externalId: "movixflow-starter-mensal-v2",
     name: "Plano Starter — MovixFlow",
     price: 19700, // R$ 197,00 em centavos
     currency: "BRL",
     frequency: "MONTHLY",
   },
   standard: {
-    externalId: "movixflow-growth-mensal",
+    externalId: "movixflow-growth-mensal-v2",
     name: "Plano Growth — MovixFlow",
     price: 67000, // R$ 670,00 em centavos
     currency: "BRL",
@@ -69,6 +69,7 @@ async function getOrCreateProduct(plan: PlanConfig): Promise<string> {
       price: plan.price,
       currency: plan.currency,
       frequency: plan.frequency,
+      cycle: plan.frequency,
     }),
   })
   const createData = await createRes.json()

@@ -138,6 +138,7 @@ export async function POST(req: NextRequest) {
     const assinaturaId: string = data?.id ?? ""
     const plano: string = data?.items?.[0]?.product?.externalId
       ?.replace("movixflow-", "")
+      ?.replace("-mensal-v2", "")
       ?.replace("-mensal", "") ?? ""
 
     switch (event.event) {
