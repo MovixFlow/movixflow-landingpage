@@ -278,10 +278,10 @@ export default function MovixFlowLanding() {
       handleCheckout(plan, clienteData.idEmpresa)
       return
     }
-    // Não logado → redireciona para o frontend com returnUrl
+    // Não logado → redireciona para o cadastro do frontend com returnUrl
     const returnUrl = typeof window !== "undefined" ? window.location.origin : ""
-    const loginUrl = `${FRONTEND_URL}/entrar?plan=${plan}&returnUrl=${encodeURIComponent(returnUrl)}`
-    window.location.href = loginUrl
+    const registerUrl = `${FRONTEND_URL}/cadastro?plan=${plan}&returnUrl=${encodeURIComponent(returnUrl)}`
+    window.location.href = registerUrl
   }
 
   // ── Cliente logado: dashboard simplificado ──────────────────────────────────
