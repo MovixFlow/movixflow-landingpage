@@ -84,7 +84,19 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const planKey = body.plan as string
+
+    // Existing user flow: empresaId is known
     const empresaId = body.empresaId as string | undefined
+
+    // New user flow: registration data passed so webhook can provision automatically
+    const registration = body.registration as {
+      nome: string
+      email: string
+      senha: string
+      nomeEmpresa: string
+      cnpjEmpresa?: string
+      telefone?: string
+    } | undefined
 
     if (!ABACATE_KEY) {
       return NextResponse.json(
@@ -98,6 +110,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Plano inválido." }, { status: 400 })
     }
 
+    if (!empresaId && !registration) {
+      return NextResponse.json(
+        { error: "É necessário informar empresaId ou dados de cadastro." },
+        { status: 400 }
+      )
+    }
+
     const appUrl = resolveAppUrl(req)
 
     if (appUrl.startsWith("http://localhost")) {
@@ -109,6 +128,20 @@ export async function POST(req: NextRequest) {
 
     const productId = await getOrCreateProduct(plan)
 
+    const metadata: Record<string, string> = {}
+    if (empresaId) {
+      metadata.empresaId = empresaId
+    }
+    if (registration) {
+      metadata.reg_nome = registration.nome
+      metadata.reg_email = registration.email
+      metadata.reg_senha = registration.senha
+      metadata.reg_nomeEmpresa = registration.nomeEmpresa
+      if (registration.cnpjEmpresa) metadata.reg_cnpjEmpresa = registration.cnpjEmpresa
+      if (registration.telefone) metadata.reg_telefone = registration.telefone
+      metadata.reg_plano = planKey
+    }
+
     const subscriptionRes = await abacate("/subscriptions/create", {
       method: "POST",
       body: JSON.stringify({
@@ -116,7 +149,7 @@ export async function POST(req: NextRequest) {
         returnUrl: `${appUrl}/`,
         completionUrl: `${appUrl}/pagamento-confirmado`,
         methods: ["CARD"],
-        ...(empresaId ? { metadata: { empresaId } } : {}),
+        metadata,
       }),
     })
     const subscriptionData = await subscriptionRes.json()

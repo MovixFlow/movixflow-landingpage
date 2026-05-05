@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState, useCallback } from "react"
+import React, { useEffect, useState, useCallback, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -28,6 +28,10 @@ import {
   TrendingDown,
   Play,
   Loader2,
+  X,
+  Eye,
+  EyeOff,
+  Building2,
 } from "lucide-react"
 import { Header } from "@/components/header"
 import { useCliente } from "@/contexts/cliente-context"
@@ -230,32 +234,96 @@ const testimonials = [
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+type RegForm = {
+  nome: string
+  email: string
+  senha: string
+  confirmSenha: string
+  nomeEmpresa: string
+  cnpjEmpresa: string
+  telefone: string
+}
+
 export default function MovixFlowLanding() {
   const { isClienteLogado, clienteData } = useCliente()
   const [showModulesModal, setShowModulesModal] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
   const [billingAnnual, setBillingAnnual] = useState(false)
 
-  const handleCheckout = useCallback(async (plan: "basic" | "standard") => {
+  // Registration modal
+  const [showRegModal, setShowRegModal] = useState(false)
+  const [pendingPlan, setPendingPlan] = useState<"basic" | "standard" | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [regError, setRegError] = useState<string | null>(null)
+  const [regForm, setRegForm] = useState<RegForm>({
+    nome: "",
+    email: "",
+    senha: "",
+    confirmSenha: "",
+    nomeEmpresa: "",
+    cnpjEmpresa: "",
+    telefone: "",
+  })
+
+  const openRegistrationModal = (plan: "basic" | "standard") => {
+    setRegError(null)
+    setRegForm({ nome: "", email: "", senha: "", confirmSenha: "", nomeEmpresa: "", cnpjEmpresa: "", telefone: "" })
+    setPendingPlan(plan)
+    setShowRegModal(true)
+  }
+
+  const handleRegFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRegForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleCheckout = useCallback(async (
+    plan: "basic" | "standard",
+    registration?: Omit<RegForm, "confirmSenha">
+  ) => {
     setCheckoutLoading(plan)
     try {
+      const body: Record<string, unknown> = { plan }
+      if (clienteData?.idEmpresa) {
+        body.empresaId = clienteData.idEmpresa
+      } else if (registration) {
+        body.registration = registration
+      }
+
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, empresaId: clienteData?.idEmpresa }),
+        body: JSON.stringify(body),
       })
       const data = await res.json()
       if (data.url) {
         window.location.href = data.url
       } else {
-        alert(data.error ?? "Erro ao iniciar pagamento. Tente novamente.")
+        setRegError(data.error ?? "Erro ao iniciar pagamento. Tente novamente.")
       }
     } catch {
-      alert("Erro ao iniciar pagamento. Tente novamente.")
+      setRegError("Erro ao iniciar pagamento. Tente novamente.")
     } finally {
       setCheckoutLoading(null)
     }
-  }, [])
+  }, [clienteData?.idEmpresa])
+
+  const handleRegSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setRegError(null)
+
+    if (regForm.senha !== regForm.confirmSenha) {
+      setRegError("As senhas não coincidem.")
+      return
+    }
+    if (regForm.senha.length < 6) {
+      setRegError("A senha deve ter pelo menos 6 caracteres.")
+      return
+    }
+    if (!pendingPlan) return
+
+    const { confirmSenha, ...registration } = regForm
+    await handleCheckout(pendingPlan, registration)
+  }
 
   // ── Cliente logado: dashboard simplificado ──────────────────────────────────
   if (isClienteLogado && clienteData) {
@@ -1026,7 +1094,13 @@ export default function MovixFlowLanding() {
                     <button
                       type="button"
                       disabled={checkoutLoading === plan.key}
-                      onClick={() => handleCheckout(plan.key as "basic" | "standard")}
+                      onClick={() => {
+                        if (isClienteLogado && clienteData?.idEmpresa) {
+                          handleCheckout(plan.key as "basic" | "standard")
+                        } else {
+                          openRegistrationModal(plan.key as "basic" | "standard")
+                        }
+                      }}
                       className={cn(
                         "w-full rounded-xl font-bold py-3.5 text-sm transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed",
                         plan.highlight
@@ -1265,6 +1339,211 @@ export default function MovixFlowLanding() {
         isOpen={showModulesModal}
         onClose={() => setShowModulesModal(false)}
       />
+
+      {/* ── Registration Modal ── */}
+      <AnimatePresence>
+        {showRegModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowRegModal(false)
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 16 }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <Building2 className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-black text-gray-900 text-sm leading-none">Criar sua conta</p>
+                    <p className="text-gray-400 text-xs mt-0.5">
+                      Plano {pendingPlan === "basic" ? "Starter" : "Growth"}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowRegModal(false)}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleRegSubmit} className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="col-span-2">
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      Seu nome completo <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="nome"
+                      required
+                      value={regForm.nome}
+                      onChange={handleRegFormChange}
+                      placeholder="João Silva"
+                      className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-300"
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      E-mail corporativo <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      value={regForm.email}
+                      onChange={handleRegFormChange}
+                      placeholder="joao@suaempresa.com.br"
+                      className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-300"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      Senha <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="senha"
+                        required
+                        value={regForm.senha}
+                        onChange={handleRegFormChange}
+                        placeholder="Mín. 6 caracteres"
+                        className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-300"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      Confirmar senha <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="confirmSenha"
+                      required
+                      value={regForm.confirmSenha}
+                      onChange={handleRegFormChange}
+                      placeholder="Repita a senha"
+                      className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-300"
+                    />
+                  </div>
+
+                  <div className="col-span-2 border-t border-gray-100 pt-3">
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
+                      Dados da empresa
+                    </p>
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      Nome da empresa <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="nomeEmpresa"
+                      required
+                      value={regForm.nomeEmpresa}
+                      onChange={handleRegFormChange}
+                      placeholder="Transportadora XPTO"
+                      className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-300"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      CNPJ
+                    </label>
+                    <input
+                      type="text"
+                      name="cnpjEmpresa"
+                      value={regForm.cnpjEmpresa}
+                      onChange={handleRegFormChange}
+                      placeholder="00.000.000/0001-00"
+                      className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-300"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      Telefone
+                    </label>
+                    <input
+                      type="tel"
+                      name="telefone"
+                      value={regForm.telefone}
+                      onChange={handleRegFormChange}
+                      placeholder="(00) 00000-0000"
+                      className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-300"
+                    />
+                  </div>
+                </div>
+
+                {regError && (
+                  <div className="flex items-start gap-2 bg-red-50 border border-red-100 rounded-xl px-3.5 py-3 text-sm text-red-700">
+                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                    {regError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={checkoutLoading === pendingPlan}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl py-3.5 text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-blue-200"
+                >
+                  {checkoutLoading === pendingPlan ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Criando conta…
+                    </>
+                  ) : (
+                    <>
+                      Continuar para pagamento
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+
+                <p className="text-center text-xs text-gray-400">
+                  Ao continuar você concorda com nossos{" "}
+                  <Link href="/termos" className="underline hover:text-gray-600">
+                    Termos de Uso
+                  </Link>{" "}
+                  e{" "}
+                  <Link href="/privacidade" className="underline hover:text-gray-600">
+                    Política de Privacidade
+                  </Link>
+                  .
+                </p>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
