@@ -20,20 +20,23 @@ type PlanConfig = {
   name: string
   price: number
   currency: string
+  frequency: "MONTHLY" | "WEEKLY" | "YEARLY"
 }
 
 const PLANS: Record<string, PlanConfig> = {
   basic: {
-    externalId: "movixflow-basic-mensal",
-    name: "Plano Basic — MovixFlow",
-    price: 6700, // R$ 67,00 em centavos
+    externalId: "movixflow-starter-mensal",
+    name: "Plano Starter — MovixFlow",
+    price: 19700, // R$ 197,00 em centavos
     currency: "BRL",
+    frequency: "MONTHLY",
   },
   standard: {
-    externalId: "movixflow-standard-mensal",
-    name: "Plano Standard — MovixFlow",
+    externalId: "movixflow-growth-mensal",
+    name: "Plano Growth — MovixFlow",
     price: 67000, // R$ 670,00 em centavos
     currency: "BRL",
+    frequency: "MONTHLY",
   },
 }
 
@@ -49,7 +52,6 @@ async function abacate(path: string, init: RequestInit = {}) {
 }
 
 async function getOrCreateProduct(plan: PlanConfig): Promise<string> {
-  // Tenta encontrar produto existente pelo externalId
   const findRes = await abacate(
     `/products/get?externalId=${encodeURIComponent(plan.externalId)}`
   )
@@ -59,7 +61,6 @@ async function getOrCreateProduct(plan: PlanConfig): Promise<string> {
     return findData.data.id as string
   }
 
-  // Cria o produto se não existir
   const createRes = await abacate("/products/create", {
     method: "POST",
     body: JSON.stringify({
@@ -67,6 +68,7 @@ async function getOrCreateProduct(plan: PlanConfig): Promise<string> {
       name: plan.name,
       price: plan.price,
       currency: plan.currency,
+      frequency: plan.frequency,
     }),
   })
   const createData = await createRes.json()
@@ -106,22 +108,22 @@ export async function POST(req: NextRequest) {
 
     const productId = await getOrCreateProduct(plan)
 
-    const checkoutRes = await abacate("/checkouts/create", {
+    const subscriptionRes = await abacate("/subscriptions/create", {
       method: "POST",
       body: JSON.stringify({
         items: [{ id: productId, quantity: 1 }],
         returnUrl: `${appUrl}/`,
         completionUrl: `${appUrl}/pagamento-confirmado`,
-        methods: ["PIX", "CARD"],
+        methods: ["CARD"],
       }),
     })
-    const checkoutData = await checkoutRes.json()
+    const subscriptionData = await subscriptionRes.json()
 
-    const url: string | undefined = checkoutData?.data?.url
+    const url: string | undefined = subscriptionData?.data?.url
     if (!url) {
-      console.error("[AbacatePay] checkout error:", JSON.stringify(checkoutData))
+      console.error("[AbacatePay] subscription error:", JSON.stringify(subscriptionData))
       return NextResponse.json(
-        { error: checkoutData?.error ?? "Erro ao criar checkout." },
+        { error: subscriptionData?.error ?? "Erro ao criar assinatura." },
         { status: 502 }
       )
     }
