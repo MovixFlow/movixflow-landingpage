@@ -458,7 +458,7 @@ export default function MovixFlowLanding() {
       <Header />
 
       {/* ── HERO ── */}
-      <section className="relative pt-24 pb-0 lg:pt-32 px-4 overflow-hidden">
+      <section className="relative pt-24 pb-16 lg:pt-32 lg:pb-0 px-4 overflow-hidden">
         {/* Background blobs */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-[120px]" />
@@ -482,7 +482,7 @@ export default function MovixFlowLanding() {
             {/* ── Coluna esquerda: texto ── */}
             <div>
               <FadeIn delay={0.06}>
-                <h1 className="text-5xl sm:text-6xl font-black tracking-tight leading-[1.08] text-gray-900 mb-6">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] text-gray-900 mb-6">
                   Gestão de{" "}
                   <span className="text-blue-600">Riscos</span>{" "}
                   e{" "}
@@ -591,7 +591,7 @@ export default function MovixFlowLanding() {
                 </div>
 
                 {/* Floating badge */}
-                <div className="absolute -bottom-4 -left-4 bg-white border border-gray-100 rounded-xl px-4 py-3 shadow-xl flex items-center gap-3">
+                <div className="hidden sm:flex absolute -bottom-4 -left-4 bg-white border border-gray-100 rounded-xl px-4 py-3 shadow-xl items-center gap-3">
                   <div className="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center">
                     <TrendingUp className="w-4 h-4 text-emerald-600" />
                   </div>
@@ -601,7 +601,7 @@ export default function MovixFlowLanding() {
                   </div>
                 </div>
 
-                <div className="absolute -top-4 -right-4 bg-white border border-gray-100 rounded-xl px-4 py-3 shadow-xl flex items-center gap-3">
+                <div className="hidden sm:flex absolute -top-4 -right-4 bg-white border border-gray-100 rounded-xl px-4 py-3 shadow-xl items-center gap-3">
                   <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
                     <Scan className="w-4 h-4 text-blue-600" />
                   </div>
@@ -635,7 +635,7 @@ export default function MovixFlowLanding() {
       </section>
 
       {/* ── COMO FUNCIONA ── */}
-      <section id="beneficios" className="py-28 px-4">
+      <section id="beneficios" className="py-16 lg:py-28 px-4">
         <div className="max-w-5xl mx-auto">
           <FadeIn>
             <div className="text-center mb-16">
@@ -743,9 +743,9 @@ export default function MovixFlowLanding() {
       </section>
 
       {/* ── BI SHOWCASE ── */}
-      <section className="py-28 px-4 bg-gray-900 overflow-hidden">
+      <section className="py-20 lg:py-28 px-4 bg-gray-900 overflow-hidden">
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <FadeIn>
               <div>
                 <span className="text-xs font-bold uppercase tracking-widest text-blue-400 mb-4 block">
@@ -853,7 +853,7 @@ export default function MovixFlowLanding() {
       </section>
 
       {/* ── DEPOIMENTOS ── */}
-      <section className="py-28 px-4">
+      <section className="py-16 lg:py-28 px-4">
         <div className="max-w-5xl mx-auto">
           <FadeIn>
             <div className="text-center mb-16">
@@ -903,7 +903,7 @@ export default function MovixFlowLanding() {
       </section>
 
       {/* ── PRICING ── */}
-      <section id="pricing" className="py-28 px-4 bg-gray-50/60 overflow-hidden">
+      <section id="pricing" className="py-16 lg:py-28 px-4 bg-gray-50/60 overflow-hidden">
         <div className="max-w-6xl mx-auto">
 
           {/* Âncora de preço */}
@@ -1126,7 +1126,7 @@ export default function MovixFlowLanding() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="py-28 px-4">
+      <section className="py-16 lg:py-28 px-4">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -1236,10 +1236,10 @@ export default function MovixFlowLanding() {
       </section>
 
       {/* ── CTA FINAL ── */}
-      <section id="contato" className="py-28 px-4">
+      <section id="contato" className="py-16 lg:py-28 px-4">
         <div className="max-w-5xl mx-auto">
           <FadeIn>
-            <div className="bg-gray-900 rounded-2xl p-12 lg:p-16 text-center relative overflow-hidden">
+            <div className="bg-gray-900 rounded-2xl p-8 sm:p-12 lg:p-16 text-center relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-indigo-600/10 pointer-events-none" />
               <div className="relative z-10">
                 <span className="text-xs font-bold uppercase tracking-widest text-blue-400 mb-5 block">
