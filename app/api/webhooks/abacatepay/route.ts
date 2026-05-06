@@ -11,6 +11,11 @@ const PLAN_LIMITS: Record<string, number> = {
   growth: 9999,
 }
 
+const PLAN_PRICE: Record<string, number> = {
+  starter: 197.0,
+  growth: 670.0,
+}
+
 function verifySignature(payload: string, signature: string): boolean {
   if (!WEBHOOK_SECRET) return true
   const expected = createHmac("sha256", WEBHOOK_SECRET).update(payload).digest("hex")
@@ -76,6 +81,7 @@ async function provisionarNovaEmpresa(
 async function atualizarLimiteBilling(empresaId: string, plano: string): Promise<void> {
   if (!BILLING_API_URL) return
   const limite = PLAN_LIMITS[plano] ?? 30
+  const valorPorUsuario = PLAN_PRICE[plano] ?? 197.0
 
   await fetch(`${BILLING_API_URL}/api/empresa_usuario_limite/cadastrar`, {
     method: "POST",
@@ -87,7 +93,7 @@ async function atualizarLimiteBilling(empresaId: string, plano: string): Promise
       empresaId,
       limiteUsuarios: limite,
       usuariosAtivos: 0,
-      valorPorUsuario: 0,
+      valorPorUsuario,
       diaCobranca: 10,
     }),
   }).catch((err) => console.warn("[AbacatePay] Erro ao atualizar limite:", err))
@@ -115,6 +121,13 @@ async function atualizarAssinaturaBilling(
       dataProximaCobranca: dataProximaCobranca ?? null,
     }),
   })
+
+  // Sincroniza status_pagamento na tabela empresa
+  const ativa = status === "ativa"
+  await fetch(`${BILLING_API_URL}/api/empresa/${empresaId}/status?ativa=${ativa}`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${BILLING_API_TOKEN}` },
+  }).catch((err) => console.warn("[AbacatePay] Erro ao atualizar status empresa:", err))
 }
 
 export async function POST(req: NextRequest) {
@@ -143,10 +156,13 @@ export async function POST(req: NextRequest) {
 
     switch (event.event) {
       case "subscription.completed": {
-        // Se não tem empresaId mas tem dados de registro → provisionar automaticamente
         if (!empresaId && metadata.reg_email) {
+          // Novo usuário: provisiona empresa + já seta o limite internamente
           const novaEmpresaId = await provisionarNovaEmpresa(metadata, plano)
           if (novaEmpresaId) empresaId = novaEmpresaId
+        } else if (empresaId) {
+          // Usuário existente: seta o limite de usuários conforme o plano
+          await atualizarLimiteBilling(empresaId, plano)
         }
 
         await atualizarAssinaturaBilling(
